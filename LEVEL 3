@@ -1,0 +1,72 @@
+# Bandit Level 2 → Level 3
+
+## Level Goal
+Menemukan password untuk level selanjutnya yang tersimpan dalam file dengan nama yang mengandung spasi (spaces in filename) di home directory.
+
+## Langkah Penyelesaian
+
+1. Login ke server menggunakan SSH:
+   ```bash
+   ssh bandit2@bandit.labs.overthewire.org -p 2220
+   ```
+   (Gunakan password yang didapat dari level sebelumnya)
+
+2. List isi direktori untuk menemukan file:
+   ```bash
+   ls
+   ```
+   Anda akan melihat file dengan nama yang mengandung spasi
+
+3. Ada beberapa cara untuk membaca file yang namanya mengandung spasi:
+
+   Cara 1 - Menggunakan tanda kutip:
+   ```bash
+   cat "spaces in this filename"
+   ```
+
+   Cara 2 - Menggunakan backslash untuk escape spasi:
+   ```bash
+   cat spaces\ in\ this\ filename
+   ```
+
+4. Password akan ditampilkan setelah menjalankan salah satu perintah di atas
+
+5. Salin password dan logout:
+   ```bash
+   exit
+   ```
+
+## Penjelasan Teknis
+
+### Mengapa Spasi dalam Nama File Bisa Bermasalah?
+- Shell Linux menggunakan spasi sebagai pemisah argumen
+- Tanpa penanganan khusus, shell akan menginterpretasikan setiap kata sebagai argumen terpisah
+- Contoh: `cat spaces in this filename` akan diinterpretasikan sebagai perintah untuk membaca 4 file berbeda:
+  1. "spaces"
+  2. "in"
+  3. "this"
+  4. "filename"
+
+### Cara Menangani Spasi dalam Nama File
+1. Tanda Kutip (Quotes):
+   - Menggunakan `"..."` atau `'...'`
+   - Semua karakter di dalam tanda kutip dianggap satu kesatuan
+
+2. Escape Character:
+   - Menggunakan backslash (`\`) sebelum spasi
+   - Backslash memberitahu shell bahwa karakter berikutnya harus diinterpretasikan secara literal
+
+3. Tab Completion:
+   - Menekan tombol Tab akan melengkapi nama file secara otomatis
+   - Shell akan menambahkan escape character yang diperlukan
+
+## Tips
+- Selalu gunakan tab completion untuk menghindari kesalahan pengetikan
+- Periksa nama file dengan cermat menggunakan `ls -l` untuk melihat detail lengkap
+- Simpan password yang ditemukan di tempat yang aman
+
+## Konsep yang Dipelajari
+- Penanganan karakter khusus dalam shell Linux
+- Penggunaan escape characters
+- Pentingnya quotes dalam shell
+- Tab completion sebagai alat bantu navigasi

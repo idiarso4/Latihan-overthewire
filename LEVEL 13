@@ -1,0 +1,109 @@
+# Bandit Level 12 → Level 13
+
+## Level Goal
+Menemukan password untuk level selanjutnya yang tersimpan dalam file `data.txt`. File ini merupakan hexdump dari file yang telah dikompresi berulang kali.
+
+## Langkah Penyelesaian
+
+1. Login ke server menggunakan SSH:
+   ```bash
+   ssh bandit12@bandit.labs.overthewire.org -p 2220
+   ```
+   (Gunakan password yang didapat dari level sebelumnya)
+
+2. Buat direktori temporer dan pindahkan file:
+   ```bash
+   cd /tmp
+   mktemp -d
+   cd /tmp/tmp.XXXXXXXXXX  # Sesuaikan dengan nama direktori yang dibuat
+   cp ~/data.txt .
+   ```
+
+3. Reverse hexdump ke binary:
+   ```bash
+   xxd -r data.txt > data.bin
+   file data.bin
+   ```
+
+4. Dekompresi berulang sesuai tipe file:
+   ```bash
+   # Untuk file gzip
+   mv data.bin data.gz
+   gzip -d data.gz
+   
+   # Untuk file bzip2
+   mv data data.bz2
+   bzip2 -d data.bz2
+   
+   # Untuk file tar
+   mv data data.tar
+   tar xf data.tar
+   ```
+   
+   Ulangi langkah ini sesuai hasil perintah `file`
+
+5. Setelah semua dekompresi selesai, baca file teks akhir:
+   ```bash
+   cat data  # atau nama file akhir
+   ```
+
+6. Salin password dan logout:
+   ```bash
+   exit
+   ```
+
+## Penjelasan Teknis
+
+### Hexdump
+- Representasi hex dari data binary
+- Format: offset + hex values + ASCII representation
+- Dapat di-reverse dengan xxd -r
+
+### Format Kompresi yang Umum
+1. gzip (.gz)
+   - Kompresi GNU
+   - Dekompresi: gzip -d
+
+2. bzip2 (.bz2)
+   - Kompresi yang lebih baik dari gzip
+   - Dekompresi: bzip2 -d
+
+3. tar (.tar)
+   - Archiver, bukan kompresi
+   - Ekstrak: tar xf
+
+### Perintah File
+- Mendeteksi tipe file
+- Membaca "magic numbers"
+- Sangat berguna untuk file unknown
+
+## Tips
+- Selalu gunakan `file` untuk cek tipe
+- Backup file sebelum manipulasi
+- Perhatikan ekstensi file
+- Gunakan direktori temporer
+
+## Konsep yang Dipelajari
+- Hexdump dan binary data
+- Multiple file compression
+- File type detection
+- Temporary directory usage
+- Command line file manipulation
+
+## Langkah Detail Dekompresi
+1. Cek tipe file dengan `file`
+2. Rename sesuai ekstensi yang tepat
+3. Gunakan tool dekompresi yang sesuai
+4. Ulangi sampai dapat file teks
+
+## Catatan Keamanan
+- Gunakan direktori temporer pribadi
+- Hapus file temporer setelah selesai
+- Jangan decompress file mencurigakan
+- Verifikasi hasil tiap langkah
+
+## Troubleshooting
+- File corrupt: cek hasil hexdump
+- Wrong extension: gunakan `file`
+- Permission denied: cek permissions
+- No space: gunakan `du` untuk cek space

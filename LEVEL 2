@@ -1,0 +1,92 @@
+# Bandit Level 1 → Level 2
+
+## Level Goal
+Menemukan password untuk level selanjutnya yang tersimpan dalam file bernama `-` di home directory.
+
+## Langkah Penyelesaian
+
+1. Login ke server menggunakan SSH:
+   ```bash
+   ssh bandit1@bandit.labs.overthewire.org -p 2220
+   ```
+   (Gunakan password yang didapat dari level sebelumnya)
+
+2. List isi direktori:
+   ```bash
+   ls -la
+   ```
+   Anda akan melihat file bernama `-`
+
+3. Ada beberapa cara untuk membaca file yang namanya `-`:
+
+   Cara 1 - Menggunakan path relatif:
+   ```bash
+   cat ./-
+   ```
+
+   Cara 2 - Menggunakan path absolut:
+   ```bash
+   cat /home/bandit1/-
+   ```
+
+   Cara 3 - Menggunakan redirect:
+   ```bash
+   cat < -
+   ```
+
+4. Password akan ditampilkan setelah menjalankan salah satu perintah di atas
+
+5. Salin password dan logout:
+   ```bash
+   exit
+   ```
+
+## Penjelasan Teknis
+
+### Mengapa File Bernama `-` Bermasalah?
+- Tanda `-` diinterpretasikan sebagai opsi command
+- Shell mencoba membacanya sebagai parameter
+- Perlu cara khusus untuk memberitahu shell bahwa `-` adalah nama file
+
+### Cara Menangani File `-`
+1. Menggunakan `./`
+   - Menunjukkan path relatif
+   - Shell tahu ini adalah file path
+
+2. Menggunakan path absolut
+   - Menunjukkan lokasi lengkap
+   - Tidak ambigu
+
+3. Menggunakan redirect
+   - `<` membaca dari file
+   - Menghindari interpretasi `-` sebagai opsi
+
+### Praktik Terbaik
+- Hindari membuat file dengan nama `-`
+- Selalu gunakan nama file yang jelas
+- Pahami cara menangani special characters
+
+## Tips
+- Gunakan tab completion untuk menghindari masalah
+- Perhatikan pesan error yang muncul
+- Coba berbagai metode jika satu cara tidak berhasil
+- Selalu verifikasi isi file setelah membacanya
+
+## Konsep yang Dipelajari
+- Special characters di shell
+- Path relatif vs absolut
+- Input/output redirection
+- Shell parameter parsing
+- Command line troubleshooting
+
+## Penggunaan di Dunia Nyata
+- Menangani file dengan nama special
+- Memahami shell behavior
+- Debugging command line issues
+- File naming conventions
+
+## Catatan Keamanan
+- Perhatikan file permissions
+- Verifikasi isi file sebelum eksekusi
+- Hindari nama file yang membingungkan
+- Selalu backup data penting

@@ -1,0 +1,73 @@
+# Bandit Level 7 → Level 8
+
+## Level Goal
+Menemukan password untuk level selanjutnya yang tersimpan dalam file `data.txt` di sebelah kata "millionth".
+
+## Langkah Penyelesaian
+
+1. Login ke server menggunakan SSH:
+   ```bash
+   ssh bandit7@bandit.labs.overthewire.org -p 2220
+   ```
+   (Gunakan password yang didapat dari level sebelumnya)
+
+2. Verifikasi keberadaan file data.txt:
+   ```bash
+   ls -l data.txt
+   ```
+
+3. Gunakan `grep` untuk mencari baris yang mengandung kata "millionth":
+   ```bash
+   grep "millionth" data.txt
+   ```
+   atau
+   ```bash
+   cat data.txt | grep "millionth"
+   ```
+
+4. Password akan muncul di sebelah kata "millionth"
+
+5. Salin password dan logout:
+   ```bash
+   exit
+   ```
+
+## Penjelasan Teknis
+
+### Perintah Grep
+- Mencari pattern dalam text
+- Format: `grep [options] pattern [file...]`
+- Case sensitive secara default
+- Bisa digunakan dengan pipe (`|`)
+
+### Opsi Grep yang Berguna
+- `-i`: case insensitive
+- `-n`: tampilkan nomor baris
+- `-v`: inverse match (tampilkan baris yang tidak cocok)
+- `-r`: recursive search
+- `-c`: hitung jumlah match
+
+### Penggunaan Pipe (|)
+- Mengirim output satu command ke command lain
+- Format: `command1 | command2`
+- Berguna untuk memproses data bertahap
+- Bisa dirangkai lebih dari dua command
+
+## Tips
+- Gunakan grep untuk mencari text dalam file besar
+- Kombinasikan dengan pipe untuk pemrosesan lebih lanjut
+- Perhatikan case sensitivity saat mencari
+- Gunakan opsi grep sesuai kebutuhan
+
+## Konsep yang Dipelajari
+- Text searching dengan grep
+- Penggunaan pipe di Linux
+- Processing file text besar
+- Pattern matching
+- Command chaining dengan pipe
+
+## Catatan Tambahan
+- File data.txt mungkin sangat besar
+- Grep sangat efisien untuk mencari dalam file besar
+- Tidak perlu membaca seluruh file secara manual
+- Pattern matching bisa lebih kompleks dengan regex

@@ -1,0 +1,110 @@
+# Bandit Level 13 → Level 14
+
+## Level Goal
+Password untuk level selanjutnya tersimpan di `/etc/bandit_pass/bandit14` dan hanya bisa dibaca oleh user bandit14. Pada level ini, kita tidak mendapatkan password secara langsung, melainkan sebuah private SSH key yang bisa digunakan untuk login ke level berikutnya.
+
+## Langkah Penyelesaian
+
+1. Login ke server menggunakan SSH:
+   ```bash
+   ssh bandit13@bandit.labs.overthewire.org -p 2220
+   ```
+   (Gunakan password yang didapat dari level sebelumnya)
+
+2. Verifikasi keberadaan private key:
+   ```bash
+   ls -l
+   ```
+   Anda akan melihat file `sshkey.private`
+
+3. Gunakan private key untuk login sebagai bandit14 ke localhost:
+   ```bash
+   ssh -i sshkey.private bandit14@localhost
+   ```
+   
+   Note: Jika ada warning tentang permissions, jalankan:
+   ```bash
+   chmod 600 sshkey.private
+   ```
+
+4. Setelah login sebagai bandit14, baca password:
+   ```bash
+   cat /etc/bandit_pass/bandit14
+   ```
+
+5. Salin password dan logout (dua kali):
+   ```bash
+   exit  # keluar dari session bandit14
+   exit  # keluar dari session bandit13
+   ```
+
+## Penjelasan Teknis
+
+### SSH Key Authentication
+- Metode autentikasi yang lebih aman dari password
+- Menggunakan pasangan key: public dan private
+- Private key harus dijaga kerahasiaannya
+- Public key bisa dishare
+
+### Komponen SSH Key
+1. Private Key
+   - Harus dijaga kerahasiaannya
+   - Permissions harus 600 (rw-------)
+   - Digunakan untuk autentikasi
+
+2. Public Key
+   - Bisa dishare
+   - Biasanya disimpan di ~/.ssh/authorized_keys
+   - Digunakan untuk verifikasi
+
+### SSH Key Permissions
+- Private key: 600 (rw-------)
+- Public key: 644 (rw-r--r--)
+- .ssh directory: 700 (rwx------)
+
+## Tips
+- Selalu set permission yang benar
+- Jangan share private key
+- Backup private key dengan aman
+- Gunakan passphrase untuk extra security
+
+## Konsep yang Dipelajari
+- SSH key authentication
+- File permissions
+- Local SSH connection
+- Secure key handling
+
+## Troubleshooting
+1. Permission denied:
+   ```bash
+   chmod 600 sshkey.private
+   ```
+
+2. Key tidak valid:
+   - Periksa format key
+   - Periksa line endings
+   - Pastikan tidak corrupt
+
+3. Connection refused:
+   - Periksa SSH service
+   - Periksa hostname
+   - Periksa port
+
+## Keamanan SSH Key
+1. Jangan pernah:
+   - Share private key
+   - Set permissions terlalu longgar
+   - Simpan tanpa enkripsi
+   - Kirim via email/chat
+
+2. Selalu:
+   - Backup private key
+   - Gunakan passphrase
+   - Monitor akses
+   - Rotate keys secara berkala
+
+## Penggunaan di Dunia Nyata
+- Git repository access
+- Server administration
+- Automated deployments
+- Secure file transfer

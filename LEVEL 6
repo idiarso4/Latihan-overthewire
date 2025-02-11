@@ -1,0 +1,72 @@
+# Bandit Level 5 → Level 6
+
+## Level Goal
+Menemukan password untuk level selanjutnya yang tersimpan dalam file dengan kriteria berikut:
+- Dapat dibaca manusia (human-readable)
+- Ukuran tepat 1033 bytes
+- Tidak executable
+- Berada di dalam direktori `inhere`
+
+## Langkah Penyelesaian
+
+1. Login ke server menggunakan SSH:
+   ```bash
+   ssh bandit5@bandit.labs.overthewire.org -p 2220
+   ```
+   (Gunakan password yang didapat dari level sebelumnya)
+
+2. Masuk ke direktori `inhere`:
+   ```bash
+   cd inhere
+   ```
+
+3. Gunakan perintah `find` dengan kriteria yang diminta:
+   ```bash
+   find . -type f -size 1033c ! -executable -exec file {} \; | grep "ASCII text"
+   ```
+   
+4. Setelah menemukan file yang sesuai, baca isinya dengan `cat`:
+   ```bash
+   cat ./maybehere07/.file2
+   ```
+   (Path file bisa berbeda, sesuaikan dengan hasil find)
+
+5. Salin password yang ditampilkan dan logout:
+   ```bash
+   exit
+   ```
+
+## Penjelasan Teknis
+
+### Perintah Find
+Breakdown perintah find yang digunakan:
+- `.` : mencari dari direktori saat ini
+- `-type f` : hanya mencari file (bukan direktori)
+- `-size 1033c` : ukuran tepat 1033 bytes (c = bytes)
+- `! -executable` : tidak executable
+- `-exec file {} \;` : jalankan perintah file untuk setiap file yang ditemukan
+- `| grep "ASCII text"` : filter hanya file yang berisi text
+
+### Opsi Size dalam Find
+- `c` : bytes
+- `k` : kilobytes
+- `M` : megabytes
+- `G` : gigabytes
+
+### File Permission di Linux
+- Executable permission ditandai dengan 'x'
+- Dapat dilihat dengan `ls -l`
+- Format: `rwxrwxrwx` (user, group, others)
+
+## Tips
+- Gunakan `find` untuk pencarian file dengan kriteria kompleks
+- Kombinasikan beberapa perintah dengan pipe (`|`)
+- Perhatikan satuan ukuran dalam perintah find
+- Gunakan `-exec` untuk menjalankan perintah pada hasil find
+
+## Konsep yang Dipelajari
+- Penggunaan advanced find command
+- File permissions di Linux
+- Kombinasi perintah dengan pipe
+- File size units
+- Executable vs non-executable files

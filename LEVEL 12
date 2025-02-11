@@ -1,0 +1,99 @@
+# Bandit Level 11 → Level 12
+
+## Level Goal
+Menemukan password untuk level selanjutnya yang tersimpan dalam file `data.txt`. Semua huruf (baik lowercase a-z maupun uppercase A-Z) telah dirotasi sebanyak 13 posisi (ROT13).
+
+## Langkah Penyelesaian
+
+1. Login ke server menggunakan SSH:
+   ```bash
+   ssh bandit11@bandit.labs.overthewire.org -p 2220
+   ```
+   (Gunakan password yang didapat dari level sebelumnya)
+
+2. Verifikasi keberadaan dan lihat isi file data.txt:
+   ```bash
+   ls -l data.txt
+   cat data.txt
+   ```
+   Anda akan melihat teks yang telah di-encode dengan ROT13
+
+3. Decode ROT13 menggunakan perintah tr:
+   ```bash
+   cat data.txt | tr 'A-Za-z' 'N-ZA-Mn-za-m'
+   ```
+   
+   Penjelasan command:
+   - `tr`: utility untuk translasi karakter
+   - `'A-Za-z'`: range input (semua huruf)
+   - `'N-ZA-Mn-za-m'`: range output (dirotasi 13 posisi)
+
+4. Password akan muncul dalam bentuk plain text
+
+5. Salin password dan logout:
+   ```bash
+   exit
+   ```
+
+## Penjelasan Teknis
+
+### ROT13 Cipher
+- Substitusi sederhana yang menggeser huruf 13 posisi
+- Simetris: aplikasi ROT13 dua kali mengembalikan teks asli
+- Contoh:
+  - A → N
+  - B → O
+  - M → Z
+  - N → A
+  - Z → M
+
+### Perintah TR
+- Utility untuk translasi karakter
+- Format: `tr [options] set1 set2`
+- Mengganti karakter dari set1 dengan set2
+- Case sensitive
+
+### Cara Kerja ROT13
+1. A-M dipetakan ke N-Z
+2. N-Z dipetakan ke A-M
+3. Sama untuk lowercase
+4. Karakter non-alfabet tidak berubah
+
+## Tips
+- ROT13 adalah cipher yang sangat sederhana
+- Bisa di-decode dengan cara yang sama dengan encode
+- Perhatikan case sensitivity
+- Gunakan tr untuk manipulasi karakter
+
+## Konsep yang Dipelajari
+- Simple substitution ciphers
+- Character translation di Unix
+- Text processing dengan tr
+- Case sensitivity dalam encoding
+
+## Variasi Command yang Bisa Digunakan
+1. Menggunakan perl:
+   ```bash
+   perl -pe 'y/A-Za-z/N-ZA-Mn-za-m/' data.txt
+   ```
+
+2. Menggunakan sed:
+   ```bash
+   sed 'y/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ/nopqrstuvwxyzabcdefghijklmNOPQRSTUVWXYZABCDEFGHIJKLM/' data.txt
+   ```
+
+3. Decode dan simpan ke file:
+   ```bash
+   cat data.txt | tr 'A-Za-z' 'N-ZA-Mn-za-m' > decoded.txt
+   ```
+
+## Catatan Keamanan
+- ROT13 BUKAN enkripsi yang aman
+- Hanya untuk obfuscation sederhana
+- Sangat mudah dipecahkan
+- Jangan gunakan untuk data sensitif
+
+## Fun Fact
+- ROT13 sering digunakan di forum untuk menyembunyikan spoiler
+- Aplikasi dua kali ROT13 mengembalikan teks asli
+- Merupakan kasus khusus dari Caesar cipher

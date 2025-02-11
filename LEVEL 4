@@ -1,0 +1,61 @@
+# Bandit Level 3 → Level 4
+
+## Level Goal
+Menemukan password untuk level selanjutnya yang tersimpan dalam file tersembunyi di dalam direktori `inhere`.
+
+## Langkah Penyelesaian
+
+1. Login ke server menggunakan SSH:
+   ```bash
+   ssh bandit3@bandit.labs.overthewire.org -p 2220
+   ```
+   (Gunakan password yang didapat dari level sebelumnya)
+
+2. Masuk ke direktori `inhere`:
+   ```bash
+   cd inhere
+   ```
+
+3. List semua file (termasuk yang tersembunyi) menggunakan opsi -a:
+   ```bash
+   ls -la
+   ```
+   File tersembunyi di Linux dimulai dengan titik (.)
+
+4. Setelah menemukan file tersembunyi, baca isinya dengan:
+   ```bash
+   cat .hidden
+   ```
+
+5. Salin password yang ditampilkan dan logout:
+   ```bash
+   exit
+   ```
+
+## Penjelasan Teknis
+
+### File Tersembunyi di Linux
+- File yang dimulai dengan titik (.) secara default tersembunyi
+- Tidak akan terlihat dengan perintah `ls` biasa
+- Memerlukan opsi khusus untuk melihatnya
+
+### Opsi ls yang Berguna
+- `ls -a`: menampilkan semua file termasuk yang tersembunyi
+- `ls -l`: menampilkan detail lengkap (permission, size, date)
+- `ls -la`: kombinasi keduanya
+
+### Mengapa File Tersembunyi?
+- Biasanya untuk menyimpan file konfigurasi
+- Menghindari clutter di direktori
+- Menyembunyikan file yang tidak perlu dilihat user
+
+## Tips
+- Selalu periksa file tersembunyi saat mencari sesuatu
+- Gunakan `ls -la` untuk melihat informasi lengkap
+- Perhatikan permission file untuk memastikan bisa diakses
+
+## Konsep yang Dipelajari
+- Konsep file tersembunyi di Linux
+- Penggunaan opsi ls untuk melihat file tersembunyi
+- Navigasi direktori dasar
+- Pentingnya memeriksa file tersembunyi dalam security testing

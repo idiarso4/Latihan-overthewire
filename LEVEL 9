@@ -1,0 +1,83 @@
+# Bandit Level 8 → Level 9
+
+## Level Goal
+Menemukan password untuk level selanjutnya yang tersimpan dalam file `data.txt`. Password adalah satu-satunya baris teks yang hanya muncul satu kali dalam file.
+
+## Langkah Penyelesaian
+
+1. Login ke server menggunakan SSH:
+   ```bash
+   ssh bandit8@bandit.labs.overthewire.org -p 2220
+   ```
+   (Gunakan password yang didapat dari level sebelumnya)
+
+2. Verifikasi keberadaan file data.txt:
+   ```bash
+   ls -l data.txt
+   ```
+
+3. Gunakan kombinasi `sort` dan `uniq` untuk menemukan baris unik:
+   ```bash
+   sort data.txt | uniq -u
+   ```
+   
+   Penjelasan command:
+   - `sort`: mengurutkan baris-baris teks
+   - `uniq -u`: menampilkan hanya baris yang muncul sekali
+
+4. Password akan ditampilkan sebagai satu-satunya output
+
+5. Salin password dan logout:
+   ```bash
+   exit
+   ```
+
+## Penjelasan Teknis
+
+### Perintah Sort
+- Mengurutkan baris teks secara alfabetis
+- Diperlukan sebelum menggunakan uniq
+- Default: ascending order
+- Case sensitive
+
+### Perintah Uniq
+- Membandingkan baris yang berdekatan
+- Harus digunakan setelah sort
+- Opsi yang berguna:
+  - `-u`: tampilkan hanya baris unik
+  - `-d`: tampilkan hanya baris duplikat
+  - `-c`: tampilkan hitungan kemunculan
+
+### Mengapa Sort Dulu?
+- Uniq hanya membandingkan baris yang berdekatan
+- Sort mengelompokkan baris yang sama
+- Kombinasi keduanya efektif untuk menemukan uniqueness
+
+## Tips
+- Selalu sort sebelum uniq
+- Gunakan opsi uniq sesuai kebutuhan
+- Perhatikan case sensitivity
+- Pipe berguna untuk menggabungkan commands
+
+## Konsep yang Dipelajari
+- Text processing di Linux
+- Penggunaan sort dan uniq
+- Piping multiple commands
+- Pattern finding dalam data
+- Pentingnya urutan command
+
+## Variasi Command yang Bisa Digunakan
+1. Dengan hitungan kemunculan:
+   ```bash
+   sort data.txt | uniq -c | grep "1 "
+   ```
+
+2. Dengan sort numerik (jika ada):
+   ```bash
+   sort -n data.txt | uniq -u
+   ```
+
+3. Case insensitive (jika perlu):
+   ```bash
+   sort -f data.txt | uniq -i -u
+   ```

@@ -1,0 +1,97 @@
+# Bandit Level 10 → Level 11
+
+## Level Goal
+Menemukan password untuk level selanjutnya yang tersimpan dalam file `data.txt`. File tersebut berisi data yang diencode menggunakan base64.
+
+## Langkah Penyelesaian
+
+1. Login ke server menggunakan SSH:
+   ```bash
+   ssh bandit10@bandit.labs.overthewire.org -p 2220
+   ```
+   (Gunakan password yang didapat dari level sebelumnya)
+
+2. Verifikasi keberadaan dan lihat isi file data.txt:
+   ```bash
+   ls -l data.txt
+   cat data.txt
+   ```
+   Anda akan melihat string yang diencode dengan base64
+
+3. Decode data menggunakan perintah base64:
+   ```bash
+   base64 -d data.txt
+   ```
+   
+   Penjelasan command:
+   - `base64`: utility untuk encode/decode base64
+   - `-d`: opsi untuk decode (default adalah encode)
+
+4. Password akan muncul dalam bentuk plain text
+
+5. Salin password dan logout:
+   ```bash
+   exit
+   ```
+
+## Penjelasan Teknis
+
+### Base64 Encoding
+- Metode encoding binary-to-text
+- Menggunakan 64 karakter (A-Z, a-z, 0-9, +, /)
+- Padding menggunakan '='
+- Sering digunakan di email dan web
+
+### Karakteristik Base64
+- Output selalu karakter ASCII printable
+- Setiap 3 byte data menjadi 4 karakter base64
+- Ukuran output ~33% lebih besar dari input
+- Tidak ada enkripsi, hanya encoding
+
+### Perintah Base64
+Opsi yang berguna:
+- `-d` atau `--decode`: decode data
+- `-i`: baca dari file
+- `-w`: wrap lines at cols
+- `--ignore-garbage`: abaikan karakter non-base64
+
+## Tips
+- Periksa apakah string adalah base64 valid
+- Perhatikan padding dengan '='
+- Base64 bukan enkripsi, hanya encoding
+- Gunakan `-w0` untuk output tanpa line breaks
+
+## Konsep yang Dipelajari
+- Base64 encoding/decoding
+- Text encoding schemes
+- Command line text processing
+- Data representation
+
+## Variasi Command yang Bisa Digunakan
+1. Decode dan simpan ke file:
+   ```bash
+   base64 -d data.txt > decoded.txt
+   ```
+
+2. Pipe dengan cat:
+   ```bash
+   cat data.txt | base64 -d
+   ```
+
+3. Dengan wrapping yang custom:
+   ```bash
+   base64 -d -w0 data.txt
+   ```
+
+## Penggunaan Base64 di Dunia Nyata
+- Email attachments
+- Web data transmission
+- Storing binary data in text format
+- URL encoding
+- SSL certificates
+
+## Catatan Keamanan
+- Base64 BUKAN metode enkripsi
+- Tidak memberikan keamanan
+- Mudah di-decode
+- Gunakan untuk encoding, bukan security

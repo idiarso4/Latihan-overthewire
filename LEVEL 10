@@ -1,0 +1,88 @@
+# Bandit Level 9 → Level 10
+
+## Level Goal
+Menemukan password untuk level selanjutnya yang tersimpan dalam file `data.txt`. Password berada di antara beberapa string yang dapat dibaca manusia (human-readable) dan didahului oleh beberapa karakter '='.
+
+## Langkah Penyelesaian
+
+1. Login ke server menggunakan SSH:
+   ```bash
+   ssh bandit9@bandit.labs.overthewire.org -p 2220
+   ```
+   (Gunakan password yang didapat dari level sebelumnya)
+
+2. Verifikasi keberadaan file data.txt:
+   ```bash
+   ls -l data.txt
+   ```
+
+3. File ini berisi data binary dan teks. Gunakan kombinasi `strings` dan `grep`:
+   ```bash
+   strings data.txt | grep "==="
+   ```
+   
+   Penjelasan command:
+   - `strings`: mengekstrak string yang dapat dibaca manusia
+   - `grep "==="`: mencari baris yang mengandung beberapa karakter '='
+
+4. Password akan muncul setelah karakter '='
+
+5. Salin password dan logout:
+   ```bash
+   exit
+   ```
+
+## Penjelasan Teknis
+
+### Perintah Strings
+- Mencari string yang dapat dibaca dalam file binary
+- Mengabaikan karakter non-printable
+- Default minimal panjang string: 4 karakter
+- Sangat berguna untuk analisis file binary
+
+### Opsi Strings yang Berguna
+- `-n N`: set minimal panjang string
+- `-f`: tampilkan nama file
+- `-t`: tampilkan offset
+- `-e`: specify encoding
+
+### Mengapa Menggunakan Strings?
+- File bisa berisi data binary
+- Tidak semua data bisa dibaca dengan cat
+- Strings mengekstrak bagian yang readable
+- Mencegah kerusakan terminal
+
+## Tips
+- Gunakan strings untuk file binary
+- Kombinasikan dengan grep untuk filter
+- Perhatikan pattern yang dicari
+- Reset terminal jika display rusak
+
+## Konsep yang Dipelajari
+- Binary file analysis
+- Text extraction dari binary
+- Pattern matching
+- Piping commands
+- File type handling
+
+## Variasi Command yang Bisa Digunakan
+1. Dengan lebih banyak konteks:
+   ```bash
+   strings data.txt | grep -A 1 -B 1 "==="
+   ```
+
+2. Dengan minimal panjang string custom:
+   ```bash
+   strings -n 8 data.txt | grep "==="
+   ```
+
+3. Dengan offset (untuk debugging):
+   ```bash
+   strings -t x data.txt | grep "==="
+   ```
+
+## Catatan Keamanan
+- Binary files bisa berbahaya
+- Selalu verifikasi file type
+- Gunakan tools yang aman
+- Jangan eksekusi file yang tidak dikenal

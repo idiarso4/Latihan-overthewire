@@ -1,0 +1,50 @@
+# Bandit Level 0 → Level 1
+
+## Level Goal
+Menemukan password untuk level selanjutnya yang tersimpan dalam file bernama `readme` di home directory.
+
+## Langkah Penyelesaian
+
+1. Login ke server menggunakan SSH:
+   ```bash
+   ssh bandit0@bandit.labs.overthewire.org -p 2220
+   ```
+   Password: bandit0
+
+2. Setelah berhasil login, kita berada di home directory. Gunakan perintah `ls` untuk melihat isi direktori:
+   ```bash
+   ls
+   ```
+   Akan terlihat file bernama `readme`
+
+3. Gunakan perintah `cat` untuk membaca isi file:
+   ```bash
+   cat readme
+   ```
+   Password untuk level selanjutnya akan ditampilkan
+
+4. Salin password tersebut dan simpan di tempat yang aman
+
+5. Logout dari server dengan perintah:
+   ```bash
+   exit
+   ```
+
+## Penjelasan Perintah yang Digunakan
+- `ssh`: Untuk melakukan remote login ke server
+- `ls`: List directory, menampilkan isi direktori
+- `cat`: Concatenate, membaca dan menampilkan isi file
+- `exit`: Keluar dari sesi SSH
+
+## Tips
+- Selalu catat password yang ditemukan
+- Password bersifat case-sensitive (huruf besar/kecil berpengaruh)
+- Jangan membagikan password ke orang lain
+
+## Konsep yang Dipelajari
+- Penggunaan SSH untuk remote login
+- Navigasi file system dasar di Linux
+- Membaca isi file di Linux
+- Pentingnya menyimpan kredensial dengan aman
+
+https://overthewire.org/wargames/bandit/bandit1.html

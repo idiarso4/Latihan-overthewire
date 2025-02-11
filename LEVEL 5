@@ -1,0 +1,72 @@
+# Bandit Level 4 → Level 5
+
+## Level Goal
+Menemukan password untuk level selanjutnya yang tersimpan dalam satu-satunya file yang dapat dibaca manusia (human-readable) di dalam direktori `inhere`.
+
+## Langkah Penyelesaian
+
+1. Login ke server menggunakan SSH:
+   ```bash
+   ssh bandit4@bandit.labs.overthewire.org -p 2220
+   ```
+   (Gunakan password yang didapat dari level sebelumnya)
+
+2. Masuk ke direktori `inhere`:
+   ```bash
+   cd inhere
+   ```
+
+3. List semua file:
+   ```bash
+   ls -la
+   ```
+   Anda akan melihat beberapa file dengan nama `-file00` sampai `-file09`
+
+4. Gunakan perintah `file` untuk mengidentifikasi tipe file:
+   ```bash
+   file ./-*
+   ```
+   Catatan: Gunakan `./` dan tanda `-` karena nama file dimulai dengan tanda minus
+
+5. Identifikasi file yang "human-readable" (biasanya bertipe ASCII text)
+
+6. Baca isi file yang teridentifikasi sebagai text:
+   ```bash
+   cat ./-fileXX    # ganti XX dengan nomor file yang benar
+   ```
+
+7. Salin password yang ditampilkan dan logout:
+   ```bash
+   exit
+   ```
+
+## Penjelasan Teknis
+
+### Perintah `file`
+- Mengidentifikasi tipe file berdasarkan kontennya
+- Tidak bergantung pada ekstensi file
+- Sangat berguna untuk file yang tidak memiliki ekstensi
+
+### Tipe File yang Umum
+- ASCII text: File teks yang bisa dibaca manusia
+- Data: File binary atau data terenkripsi
+- Empty: File kosong
+- ELF: Executable file di Linux
+
+### Menangani Nama File yang Dimulai dengan -
+- Gunakan `./` di depan nama file
+- Atau gunakan path absolut
+- Mencegah shell menginterpretasikan nama file sebagai opsi command
+
+## Tips
+- Gunakan `file` untuk mengidentifikasi tipe file
+- Perhatikan output `file` untuk menemukan file text
+- Jika terminal rusak setelah membaca file binary, gunakan perintah `reset`
+- Gunakan `cat` dengan hati-hati pada file binary
+
+## Konsep yang Dipelajari
+- Penggunaan perintah `file`
+- Perbedaan file binary dan text
+- Menangani nama file yang "tricky"
+- Pentingnya identifikasi tipe file dalam security
+- Penggunaan wildcard dalam command Linux

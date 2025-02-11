@@ -1,0 +1,70 @@
+# Bandit Level 6 → Level 7
+
+## Level Goal
+Menemukan password untuk level selanjutnya yang tersimpan dalam file dengan kriteria:
+- Dimiliki oleh user bandit7
+- Dimiliki oleh group bandit6
+- Ukuran tepat 33 bytes
+- Berada di suatu tempat di server
+
+## Langkah Penyelesaian
+
+1. Login ke server menggunakan SSH:
+   ```bash
+   ssh bandit6@bandit.labs.overthewire.org -p 2220
+   ```
+   (Gunakan password yang didapat dari level sebelumnya)
+
+2. Gunakan perintah `find` untuk mencari file dengan kriteria tersebut:
+   ```bash
+   find / -user bandit7 -group bandit6 -size 33c 2>/dev/null
+   ```
+
+3. Setelah menemukan file yang sesuai, baca isinya dengan `cat`:
+   ```bash
+   cat /var/lib/dpkg/info/bandit7.password
+   ```
+   (Path file bisa berbeda, sesuaikan dengan hasil find)
+
+4. Salin password yang ditampilkan dan logout:
+   ```bash
+   exit
+   ```
+
+## Penjelasan Teknis
+
+### Perintah Find yang Digunakan
+Breakdown perintah find:
+- `/` : mencari dari root directory
+- `-user bandit7` : file dimiliki user bandit7
+- `-group bandit6` : file dimiliki group bandit6
+- `-size 33c` : ukuran tepat 33 bytes
+- `2>/dev/null` : mengabaikan pesan error permission denied
+
+### File Ownership di Linux
+- Setiap file memiliki owner (user) dan group
+- Dapat dilihat dengan `ls -l`
+- Format: `user:group`
+
+### Redirect Error di Linux
+- `2>/dev/null` : mengalihkan stderr ke /dev/null
+- Berguna untuk mengabaikan pesan error
+- stderr adalah file descriptor 2
+
+### Permission Denied
+- Banyak direktori tidak bisa diakses user biasa
+- Menggunakan `2>/dev/null` untuk menyembunyikan error
+- Tetap bisa menemukan file yang dicari meski ada error
+
+## Tips
+- Gunakan `/` untuk mencari di seluruh sistem
+- Selalu redirect error saat mencari di system directories
+- Perhatikan ownership file dengan `ls -l`
+- Cek permission sebelum mencoba membaca file
+
+## Konsep yang Dipelajari
+- File ownership (user dan group)
+- System-wide file search
+- Error redirection
+- Linux file permissions
+- Root directory structure

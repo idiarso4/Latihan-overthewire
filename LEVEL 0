@@ -1,0 +1,224 @@
+# Bandit Level 0
+
+## Level Goal
+Melakukan login ke dalam game menggunakan SSH (Secure Shell).
+
+## Informasi Server
+- Host: bandit.labs.overthewire.org
+- Port: 2220
+- Username: bandit0
+- Password: bandit0
+
+## Langkah Penyelesaian Detail
+
+1. Memahami SSH (Secure Shell):
+   - SSH adalah protokol yang memungkinkan komunikasi terenkripsi antara dua komputer
+   - Menggunakan sistem kriptografi public key
+   - Lebih aman dibanding telnet yang mengirim data tanpa enkripsi
+   - Format umum: `ssh username@hostname -p port`
+
+2. Persiapan Koneksi:
+   - Pastikan komputer Anda terhubung ke internet
+   - SSH client sudah terinstall (built-in di Linux/Mac, PuTTY di Windows)
+   - Terminal atau command prompt sudah terbuka
+
+3. Melakukan Koneksi SSH:
+   ```bash
+   ssh bandit0@bandit.labs.overthewire.org -p 2220
+   ```
+   
+   Breakdown perintah:
+   - `ssh`: memanggil program SSH client
+   - `bandit0`: username yang akan digunakan
+   - `@`: pemisah antara username dan hostname
+   - `bandit.labs.overthewire.org`: hostname server tujuan
+   - `-p 2220`: menentukan port koneksi (default SSH adalah 22)
+
+4. Menangani SSH Host Key Warning:
+   ```
+   The authenticity of host '[bandit.labs.overthewire.org]:2220 ([hostname]):2220)' can't be established.
+   ED25519 key fingerprint is SHA256:C2ihUBV7ihnV1wUXRb4RrEcLfXC5CXlhmAAM/urerLY.
+   Are you sure you want to continue connecting (yes/no/[fingerprint])?
+   ```
+   
+   - Warning ini normal saat pertama kali koneksi
+   - Fingerprint adalah identitas unik server
+   - Ketik "yes" untuk melanjutkan dan menyimpan fingerprint
+   - Server akan ditambahkan ke file ~/.ssh/known_hosts
+
+5. Memasukkan Password:
+   ```
+   bandit0@bandit.labs.overthewire.org's password: bandit0
+   ```
+   - Password tidak akan terlihat saat diketik (security feature)
+   - Tekan Enter setelah mengetik password
+   - Jika gagal, periksa caps lock dan coba lagi
+
+6. Verifikasi Login Berhasil:
+   - Prompt akan berubah menjadi: `bandit0@bandit:~$`
+   - `~` menandakan Anda berada di home directory
+   - `$` menandakan Anda adalah regular user
+
+## Penjelasan Mendalam
+
+### 1. Komponen SSH
+- Client: Program di komputer Anda yang memulai koneksi
+- Server: Program di remote host yang menerima koneksi
+- Protocol: Aturan komunikasi yang digunakan
+- Port: Endpoint komunikasi (2220 dalam kasus ini)
+- Encryption: Metode pengamanan data yang ditransmisikan
+
+### 2. Keamanan SSH
+1. Enkripsi:
+   - Symmetric encryption untuk session
+   - Asymmetric encryption untuk key exchange
+   - Hashing untuk integritas data
+
+2. Autentikasi:
+   - Password-based (yang digunakan di level ini)
+   - Key-based (lebih aman, digunakan di level lanjut)
+   - Host-based (menggunakan known_hosts)
+
+3. Session:
+   - Setiap koneksi adalah session terpisah
+   - Session terenkripsi end-to-end
+   - Automatic key re-exchange untuk keamanan tambahan
+
+### 3. SSH Client Configuration
+File konfigurasi: ~/.ssh/config
+```
+Host bandit0
+    HostName bandit.labs.overthewire.org
+    Port 2220
+    User bandit0
+```
+
+### 4. Troubleshooting Umum
+
+1. Connection Refused:
+   ```bash
+   ssh: connect to host bandit.labs.overthewire.org port 2220: Connection refused
+   ```
+   Solusi:
+   - Periksa koneksi internet
+   - Verifikasi hostname dan port
+   - Cek firewall settings
+
+2. Connection Timed Out:
+   ```bash
+   ssh: connect to host bandit.labs.overthewire.org port 2220: Connection timed out
+   ```
+   Solusi:
+   - Periksa DNS resolution
+   - Cek routing ke server
+   - Verifikasi network connectivity
+
+3. Permission Denied:
+   ```bash
+   Permission denied (publickey,password)
+   ```
+   Solusi:
+   - Periksa username
+   - Verifikasi password
+   - Cek SSH key permissions
+
+### 5. Best Practices SSH
+
+1. Keamanan:
+   - Gunakan strong passwords
+   - Enable key-based authentication
+   - Disable password authentication jika memungkinkan
+   - Batasi jumlah login attempts
+
+2. Performance:
+   - Gunakan connection sharing untuk multiple sessions
+   - Enable compression jika bandwidth terbatas
+   - Gunakan ControlMaster untuk optimasi
+
+3. Convenience:
+   - Setup SSH config file
+   - Gunakan SSH agent untuk key management
+   - Buat aliases untuk koneksi umum
+
+### 6. SSH Advanced Features
+
+1. Port Forwarding:
+   ```bash
+   ssh -L local_port:remote_host:remote_port username@hostname
+   ```
+
+2. X11 Forwarding:
+   ```bash
+   ssh -X username@hostname
+   ```
+
+3. Jump Hosts:
+   ```bash
+   ssh -J jumphost username@destination
+   ```
+
+## Konsep yang Dipelajari
+1. Network Security:
+   - Enkripsi data
+   - Secure authentication
+   - Public key infrastructure
+
+2. Remote Access:
+   - Client-server architecture
+   - Network protocols
+   - Port numbers dan networking
+
+3. Linux Basics:
+   - Command line interface
+   - Terminal usage
+   - User authentication
+
+4. System Administration:
+   - User management
+   - Remote server access
+   - Security best practices
+
+## Penggunaan di Dunia Nyata
+1. Server Management:
+   - Remote server administration
+   - Cloud computing access
+   - Database management
+
+2. Development:
+   - Remote development servers
+   - Version control systems
+   - Continuous integration
+
+3. Security:
+   - Secure file transfer
+   - Remote backup systems
+   - System monitoring
+
+## Tips Tambahan
+1. Productivity:
+   - Gunakan tab completion
+   - Manfaatkan history command
+   - Buat aliases untuk command umum
+
+2. Security:
+   - Selalu logout setelah selesai
+   - Jangan share credentials
+   - Monitor login attempts
+
+3. Troubleshooting:
+   - Gunakan verbose mode (-v)
+   - Check system logs
+   - Dokumentasikan error
+
+## Referensi Lebih Lanjut
+1. Manual Pages:
+   ```bash
+   man ssh
+   man ssh_config
+   man sshd_config
+   ```
+
+2. Online Resources:
+   - SSH.com Documentation
+   - OpenSSH Documentation
+   - Linux Documentation Project

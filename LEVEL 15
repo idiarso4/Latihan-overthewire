@@ -1,0 +1,124 @@
+# Bandit Level 14 → Level 15
+
+## Level Goal
+Mendapatkan password untuk level selanjutnya dengan cara mengirimkan password level saat ini ke port 30000 pada localhost.
+
+## Langkah Penyelesaian
+
+1. Login ke server menggunakan SSH:
+   ```bash
+   ssh bandit14@bandit.labs.overthewire.org -p 2220
+   ```
+   (Gunakan password yang didapat dari level sebelumnya)
+
+2. Baca password level saat ini:
+   ```bash
+   cat /etc/bandit_pass/bandit14
+   ```
+
+3. Kirim password ke localhost port 30000. Ada beberapa cara:
+
+   Menggunakan nc (netcat):
+   ```bash
+   echo "[password_level_14]" | nc localhost 30000
+   ```
+
+   Atau menggunakan telnet:
+   ```bash
+   telnet localhost 30000
+   ```
+   Kemudian paste password dan tekan Enter
+
+4. Password untuk level selanjutnya akan ditampilkan sebagai response
+
+5. Salin password dan logout:
+   ```bash
+   exit
+   ```
+
+## Penjelasan Teknis
+
+### Localhost
+- Merujuk ke komputer lokal
+- IP address: 127.0.0.1
+- Hostname: localhost
+- Digunakan untuk testing network services
+
+### Port
+- Endpoint komunikasi di network
+- Range: 0-65535
+- Well-known ports: 0-1023
+- Registered ports: 1024-49151
+- Dynamic ports: 49152-65535
+
+### Network Tools
+
+1. Netcat (nc)
+- Swiss army knife untuk TCP/IP
+- Bisa sebagai client atau server
+- Mendukung TCP dan UDP
+- Sangat berguna untuk debugging
+
+2. Telnet
+- Protocol untuk remote access
+- Plain text (tidak aman)
+- Berguna untuk testing TCP ports
+- Tidak direkomendasikan untuk remote access
+
+## Tips
+- Selalu catat port number
+- Gunakan nc untuk quick testing
+- Perhatikan format input/output
+- Simpan password dengan aman
+
+## Konsep yang Dipelajari
+- Network basics
+- Port dan services
+- Client-server communication
+- Network debugging tools
+
+## Variasi Command
+
+1. Menggunakan nc dengan timeout:
+   ```bash
+   echo "[password]" | nc -w 5 localhost 30000
+   ```
+
+2. Menggunakan nc verbose mode:
+   ```bash
+   echo "[password]" | nc -v localhost 30000
+   ```
+
+3. Menggunakan telnet dengan timeout:
+   ```bash
+   (echo "[password]"; sleep 1) | telnet localhost 30000
+   ```
+
+## Troubleshooting
+
+1. Connection refused:
+   - Periksa port number
+   - Pastikan service running
+   - Cek firewall settings
+
+2. No response:
+   - Periksa format input
+   - Cek network connectivity
+   - Tambahkan newline di input
+
+3. Wrong output:
+   - Verifikasi password
+   - Periksa format pengiriman
+   - Cek special characters
+
+## Network Security Notes
+- Port scanning bisa illegal
+- Selalu dapat izin sebelum testing
+- Gunakan tools dengan bertanggung jawab
+- Monitor network activity
+
+## Penggunaan di Dunia Nyata
+- Network service testing
+- Port scanning
+- Service debugging
+- Protocol analysis
