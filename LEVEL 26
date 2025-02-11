@@ -1,0 +1,315 @@
+# Bandit Level 25 → Level 26
+
+## Level Goal
+Menemukan password untuk level selanjutnya dengan mengakses shell yang dibatasi. Shell yang digunakan adalah 'more' dan kita perlu menemukan cara untuk keluar dari pembatasan ini.
+
+## Detailed Command Breakdown
+
+### 1. SSH Connection
+```bash
+ssh bandit25@bandit.labs.overthewire.org -p 2220
+```
+
+### 2. Shell Investigation
+```bash
+# Check shell
+echo $SHELL
+cat /etc/passwd | grep bandit26
+
+# View restrictions
+ls -l /home/bandit26
+cat /home/bandit26/.bashrc
+```
+
+## Shell Manipulation
+
+### 1. Terminal Control
+```bash
+# Get terminal info
+tput lines
+tput cols
+
+# Set terminal size
+stty rows 20
+stty cols 80
+
+# Reset terminal
+reset
+tput reset
+```
+
+### 2. Editor Commands
+```bash
+# Vi commands
+:set shell=/bin/bash
+:shell
+:!/bin/bash
+
+# More commands
+!command
+v
+:e file
+```
+
+### 3. Shell Escape
+```bash
+# Common methods
+python -c 'import pty; pty.spawn("/bin/bash")'
+perl -e 'exec "/bin/bash";'
+ruby -e 'exec "/bin/bash"'
+```
+
+## Terminal Management
+
+### 1. Screen Size
+```bash
+# Get dimensions
+stty size
+echo $LINES $COLUMNS
+
+# Set dimensions
+resize
+resize -s 24 80
+```
+
+### 2. Terminal Settings
+```bash
+# Save settings
+stty -g > settings
+
+# Restore settings
+stty $(cat settings)
+
+# Reset settings
+stty sane
+```
+
+### 3. Terminal Type
+```bash
+# Check type
+echo $TERM
+tset -q
+
+# Set type
+TERM=xterm
+export TERM=xterm-256color
+```
+
+## Process Control
+
+### 1. Shell Properties
+```bash
+# Process info
+ps -p $$
+ps -o cmd= -p $$
+
+# Parent process
+ps -o ppid= -p $$
+ps -o comm= -p $PPID
+```
+
+### 2. Job Control
+```bash
+# List jobs
+jobs
+jobs -l
+
+# Control jobs
+fg %1
+bg %1
+```
+
+### 3. Process Management
+```bash
+# Process tree
+pstree -p $$
+ps -ejH
+
+# Process status
+ps aux
+top -p $$
+```
+
+## File Operations
+
+### 1. File Examination
+```bash
+# View file
+less file
+more file
+most file
+
+# File info
+file -b file
+stat file
+```
+
+### 2. File Permissions
+```bash
+# Check permissions
+ls -l file
+namei -l file
+
+# Modify permissions
+chmod +x file
+chmod u+s file
+```
+
+### 3. File Monitoring
+```bash
+# Watch changes
+tail -f file
+watch cat file
+
+# Monitor access
+inotifywait -m file
+auditctl -w file
+```
+
+## Shell Features
+
+### 1. Environment
+```bash
+# Show environment
+env
+printenv
+
+# Modify environment
+export VAR=value
+unset VAR
+```
+
+### 2. Shell Options
+```bash
+# List options
+set -o
+shopt
+
+# Set options
+set -o option
+shopt -s option
+```
+
+### 3. Shell Functions
+```bash
+# Define function
+function_name() {
+    commands
+}
+
+# List functions
+declare -F
+set | grep '^function'
+```
+
+## Security Considerations
+
+### 1. Shell Restrictions
+```bash
+# Check restrictions
+ulimit -a
+/etc/security/limits.conf
+
+# Set limits
+ulimit -n 1024
+ulimit -u 100
+```
+
+### 2. Process Security
+```bash
+# Process isolation
+chroot /path command
+firejail command
+
+# Resource limits
+nice -n 19 command
+cpulimit -l 50 command
+```
+
+### 3. Access Control
+```bash
+# User info
+id
+groups
+
+# Permission check
+sudo -l
+getcap file
+```
+
+## Debugging Techniques
+
+### 1. Shell Debug
+```bash
+# Enable debug
+set -x
+set -v
+
+# Trace execution
+bash -x script.sh
+PS4='${BASH_SOURCE}:${LINENO}: ' bash -x
+```
+
+### 2. Process Debug
+```bash
+# Trace system calls
+strace command
+ltrace command
+
+# Debug info
+gdb -p $$
+pstack $$
+```
+
+### 3. Environment Debug
+```bash
+# Shell state
+set
+declare -p
+
+# Process environment
+cat /proc/$$/environ
+strings /proc/$$/environ
+```
+
+## Best Practices
+
+### 1. Shell Security
+- Minimal privileges
+- Resource limits
+- Input validation
+- Error handling
+
+### 2. Terminal Control
+- Proper sizing
+- Clean state
+- Error recovery
+- Session management
+
+### 3. Process Management
+- Clean environment
+- Resource control
+- Error handling
+- Proper cleanup
+
+## Additional Resources
+
+### 1. Man Pages
+```bash
+man bash
+man vi
+man more
+man less
+```
+
+### 2. Documentation
+- Shell Guide
+- Terminal Control
+- Process Management
+- Security Best Practices
+
+### 3. Tools
+- Terminal utilities
+- Process monitors
+- Debug helpers
+- Security tools

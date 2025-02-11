@@ -1,0 +1,322 @@
+# Bandit Level 32 → Level 33
+
+## Level Goal
+Menemukan password untuk level selanjutnya dengan memanfaatkan pemahaman tentang shell scripting dan variable expansion untuk keluar dari shell yang telah dimodifikasi.
+
+## Detailed Command Breakdown
+
+### 1. SSH Connection
+```bash
+ssh bandit32@bandit.labs.overthewire.org -p 2220
+```
+
+### 2. Shell Analysis
+```bash
+# Check shell type
+echo $0
+ps -p $$
+
+# View environment
+env
+set
+```
+
+## Shell Expansion
+
+### 1. Parameter Expansion
+```bash
+# Basic expansion
+${parameter}
+${parameter:-default}
+${parameter:=default}
+
+# Pattern substitution
+${parameter#pattern}
+${parameter##pattern}
+${parameter%pattern}
+${parameter%%pattern}
+```
+
+### 2. Command Substitution
+```bash
+# Command output
+$(command)
+`command`
+
+# Process substitution
+<(command)
+>(command)
+```
+
+### 3. Arithmetic Expansion
+```bash
+# Basic arithmetic
+$((expression))
+$[expression]
+
+# Advanced math
+$(bc <<< "scale=2; 3/2")
+```
+
+## Variable Manipulation
+
+### 1. String Operations
+```bash
+# String length
+${#string}
+expr length "$string"
+
+# Substring
+${string:position}
+${string:position:length}
+
+# Case modification
+${string^^}
+${string,,}
+```
+
+### 2. Array Operations
+```bash
+# Array elements
+${array[*]}
+${array[@]}
+
+# Array length
+${#array[*]}
+${#array[@]}
+
+# Array operations
+array=($list)
+array+=("element")
+```
+
+### 3. Associative Arrays
+```bash
+# Declare array
+declare -A array
+array[key]=value
+
+# Access elements
+${array[key]}
+${!array[@]}
+```
+
+## Advanced Shell Features
+
+### 1. Shell Options
+```bash
+# Set options
+set -o option
+shopt -s option
+
+# List options
+set -o
+shopt -p
+```
+
+### 2. Shell Functions
+```bash
+# Define function
+function name {
+    commands
+}
+
+# Export function
+export -f name
+declare -f name
+```
+
+### 3. Shell Builtins
+```bash
+# List builtins
+help
+enable
+
+# Builtin options
+help builtin
+enable -n builtin
+```
+
+## Process Management
+
+### 1. Process Creation
+```bash
+# Start process
+exec command
+system("command")
+
+# Background process
+command &
+nohup command
+```
+
+### 2. Process Control
+```bash
+# Process info
+ps -p $$
+pgrep -f pattern
+
+# Process signals
+kill -l
+trap 'handler' SIGNAL
+```
+
+### 3. Job Control
+```bash
+# Job management
+jobs
+fg %n
+bg %n
+
+# Job signals
+kill %n
+wait %n
+```
+
+## File Descriptors
+
+### 1. Standard Streams
+```bash
+# Input/Output
+exec 3< input
+exec 4> output
+
+# Duplicate descriptors
+exec 5>&1
+exec 2>&1
+```
+
+### 2. Here Documents
+```bash
+# Basic heredoc
+cat << EOF
+content
+EOF
+
+# Quoted heredoc
+cat << 'EOF'
+$content
+EOF
+```
+
+### 3. Here Strings
+```bash
+# Command input
+command <<< "string"
+command <<< $variable
+
+# Process input
+while read -r line; do
+    echo "$line"
+done <<< "$input"
+```
+
+## Security Measures
+
+### 1. Input Validation
+```bash
+# Pattern matching
+[[ $input =~ ^[0-9]+$ ]]
+[[ $input == *[!a-zA-Z0-9]* ]]
+
+# String cleaning
+input=${input//[^a-zA-Z0-9]/}
+```
+
+### 2. Environment Security
+```bash
+# Clean environment
+env -i command
+unset ENV
+
+# Safe path
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin
+```
+
+### 3. Privilege Control
+```bash
+# Drop privileges
+sudo -u nobody command
+su - nobody -c command
+
+# Resource limits
+ulimit -n 1024
+nice -n 19 command
+```
+
+## Debugging Tools
+
+### 1. Shell Debug
+```bash
+# Debug mode
+set -x
+set -v
+
+# Debug output
+PS4='${BASH_SOURCE}:${LINENO}: '
+export BASH_XTRACEFD=1
+```
+
+### 2. Process Debug
+```bash
+# System calls
+strace command
+ltrace command
+
+# Process tree
+pstree -p $$
+ps auxf
+```
+
+### 3. Environment Debug
+```bash
+# Show variables
+set
+declare -p
+
+# Show functions
+declare -f
+typeset -f
+```
+
+## Best Practices
+
+### 1. Code Structure
+- Clear organization
+- Good documentation
+- Error handling
+- Clean exit
+
+### 2. Security
+- Input validation
+- Environment control
+- Privilege management
+- Resource limits
+
+### 3. Maintenance
+- Version control
+- Documentation
+- Testing
+- Monitoring
+
+## Additional Resources
+
+### 1. Man Pages
+```bash
+man bash
+man set
+man declare
+man trap
+```
+
+### 2. Documentation
+- Bash Guide
+- Shell Security
+- Best Practices
+- Debug Guide
+
+### 3. Tools
+- Shell checkers
+- Debug tools
+- Security scanners
+- Process monitors

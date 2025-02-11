@@ -1,0 +1,310 @@
+# Bandit Level 28 → Level 29
+
+## Level Goal
+Menemukan password untuk level selanjutnya dengan mengkloning repository Git dan mencari password yang telah dienkripsi atau disembunyikan dalam history commit.
+
+## Detailed Command Breakdown
+
+### 1. SSH Connection
+```bash
+ssh bandit28@bandit.labs.overthewire.org -p 2220
+```
+
+### 2. Repository Inspection
+```bash
+# Clone repository
+mktemp -d
+cd /tmp/tempdir
+git clone ssh://bandit28-git@localhost/home/bandit28-git/repo
+
+# View history
+git log --all --decorate --oneline --graph
+git log -p
+```
+
+## Git History Analysis
+
+### 1. Commit History
+```bash
+# View commits
+git log
+git log --pretty=format:"%h - %an, %ar : %s"
+
+# Show changes
+git show commit
+git diff commit1 commit2
+```
+
+### 2. File History
+```bash
+# Track changes
+git log --follow file
+git blame file
+
+# View versions
+git show commit:file
+git checkout commit -- file
+```
+
+### 3. Branch History
+```bash
+# View branches
+git branch -a -v
+git show-branch --all
+
+# Compare branches
+git log branch1..branch2
+git diff branch1...branch2
+```
+
+## Data Recovery
+
+### 1. Lost Commits
+```bash
+# View reflog
+git reflog
+git log -g
+
+# Recover commits
+git cherry-pick commit
+git revert commit
+```
+
+### 2. Deleted Data
+```bash
+# Find objects
+git fsck --lost-found
+git count-objects -v
+
+# Restore files
+git checkout commit -- file
+git restore --source=commit file
+```
+
+### 3. Stashed Changes
+```bash
+# List stashes
+git stash list
+git stash show
+
+# Apply stash
+git stash apply
+git stash pop
+```
+
+## Content Search
+
+### 1. Text Search
+```bash
+# Search content
+git grep pattern
+git grep -l pattern
+
+# Search history
+git log -S pattern
+git log -G pattern
+```
+
+### 2. Commit Search
+```bash
+# Search messages
+git log --grep="pattern"
+git show :/pattern
+
+# Search changes
+git log -p -S "string"
+git log -G "regex"
+```
+
+### 3. File Search
+```bash
+# Find files
+git ls-files pattern
+git ls-tree -r HEAD
+
+# Track renames
+git log --follow file
+git log --name-status
+```
+
+## Advanced History
+
+### 1. Rewriting History
+```bash
+# Amend commit
+git commit --amend
+git rebase -i HEAD~n
+
+# Filter branch
+git filter-branch
+git filter-repo
+```
+
+### 2. History Cleanup
+```bash
+# Remove files
+git rm --cached file
+git filter-branch --index-filter
+
+# Clean history
+git gc
+git prune
+```
+
+### 3. History Analysis
+```bash
+# Statistics
+git shortlog -sn
+git contrib
+
+# Visualization
+git log --graph
+gitk --all
+```
+
+## Security Considerations
+
+### 1. Sensitive Data
+```bash
+# Find secrets
+git grep -i password
+git log -p | grep -i secret
+
+# Remove secrets
+git filter-branch --force
+git filter-repo
+```
+
+### 2. Access Control
+```bash
+# Check permissions
+git ls-files -s
+git check-ignore pattern
+
+# Set permissions
+git update-index --chmod=+x file
+chmod 600 .git/config
+```
+
+### 3. Authentication
+```bash
+# SSH config
+git config --get remote.origin.url
+ssh -Tv git@host
+
+# Credential cache
+git config credential.helper cache
+git credential approve
+```
+
+## Performance Optimization
+
+### 1. Repository Size
+```bash
+# Check size
+git count-objects -vH
+du -sh .git
+
+# Optimize repo
+git gc --aggressive
+git repack -a -d
+```
+
+### 2. Clone Optimization
+```bash
+# Shallow clone
+git clone --depth 1
+git clone --single-branch
+
+# Partial clone
+git clone --filter=blob:none
+git clone --sparse
+```
+
+### 3. Operation Speed
+```bash
+# Fast operations
+git status --untracked-files=no
+git grep --cached pattern
+
+# Index optimization
+git update-index --assume-unchanged
+git update-index --skip-worktree
+```
+
+## Troubleshooting
+
+### 1. Common Issues
+```bash
+# Fix corruption
+git fsck
+git prune
+
+# Repair refs
+git update-ref -d ref
+git gc --prune=now
+```
+
+### 2. Network Issues
+```bash
+# Debug connection
+GIT_TRACE=1 git fetch
+ssh -vT git@host
+
+# Fix SSL
+git config http.sslVerify false
+export GIT_SSL_NO_VERIFY=1
+```
+
+### 3. Data Issues
+```bash
+# Check integrity
+git fsck --full
+git verify-pack -v pack
+
+# Recover data
+git reflog expire
+git fsck --lost-found
+```
+
+## Best Practices
+
+### 1. History Management
+- Clean commits
+- Clear messages
+- Regular maintenance
+- Security review
+
+### 2. Data Handling
+- Secure storage
+- Regular backups
+- Access control
+- Data cleanup
+
+### 3. Performance
+- Repository size
+- Operation speed
+- Network usage
+- Resource usage
+
+## Additional Resources
+
+### 1. Man Pages
+```bash
+man git-log
+man git-show
+man git-grep
+man git-filter-branch
+```
+
+### 2. Documentation
+- Git History
+- Data Recovery
+- Security Guide
+- Performance Tips
+
+### 3. Tools
+- History viewers
+- Data recovery
+- Security scanners
+- Performance tools

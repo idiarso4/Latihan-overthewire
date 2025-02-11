@@ -1,0 +1,308 @@
+# Bandit Level 33 → Level 34
+
+## Level Goal
+Mencapai level terakhir dari Bandit wargame dan mendapatkan pemahaman mendalam tentang konsep-konsep yang telah dipelajari.
+
+## Detailed Command Breakdown
+
+### 1. SSH Connection
+```bash
+ssh bandit33@bandit.labs.overthewire.org -p 2220
+```
+
+### 2. Final Analysis
+```bash
+# Check environment
+ls -la
+cat README.txt
+
+# Review permissions
+ls -l /etc/bandit_pass/
+id
+```
+
+## System Security
+
+### 1. Access Control
+```bash
+# User information
+id
+groups
+sudo -l
+
+# File permissions
+ls -l
+getfacl file
+```
+
+### 2. Process Security
+```bash
+# Process info
+ps -eo user,pid,cmd
+ps aux --forest
+
+# Resource limits
+ulimit -a
+/etc/security/limits.conf
+```
+
+### 3. Network Security
+```bash
+# Connection info
+netstat -tuln
+ss -tuln
+
+# Firewall rules
+iptables -L
+nft list ruleset
+```
+
+## Advanced Shell Usage
+
+### 1. Shell Features
+```bash
+# Shell type
+echo $SHELL
+ps -p $$
+
+# Shell options
+set -o
+shopt
+```
+
+### 2. Command Execution
+```bash
+# Command lookup
+type command
+which command
+
+# Command history
+history
+fc -l
+```
+
+### 3. Shell Scripting
+```bash
+# Script execution
+bash -x script.sh
+set -x
+
+# Error handling
+set -e
+trap 'handler' ERR
+```
+
+## File System Operations
+
+### 1. File Management
+```bash
+# File operations
+find / -type f -perm -4000
+locate pattern
+whereis command
+```
+
+### 2. File Monitoring
+```bash
+# Watch files
+inotifywait -m directory
+tail -f file
+
+# File changes
+stat file
+ls -l --time=atime file
+```
+
+### 3. File Analysis
+```bash
+# File type
+file -b file
+stat file
+
+# File content
+strings file
+hexdump -C file
+```
+
+## Process Control
+
+### 1. Process Management
+```bash
+# Process control
+nice -n 19 command
+renice +19 -p pid
+
+# Resource control
+cpulimit -l 50 command
+cgroups-mount
+```
+
+### 2. Job Control
+```bash
+# Job management
+jobs
+fg %n
+bg %n
+
+# Process groups
+kill -TERM -pid
+pkill -g group
+```
+
+### 3. Service Management
+```bash
+# Service control
+systemctl status service
+service service status
+
+# System services
+systemctl list-units
+service --status-all
+```
+
+## Network Operations
+
+### 1. Network Analysis
+```bash
+# Network info
+ip addr
+ifconfig
+
+# Connection tracking
+netstat -ant
+ss -ant
+```
+
+### 2. Network Tools
+```bash
+# Network debug
+ping host
+traceroute host
+
+# Port scanning
+nc -zv host port
+nmap -p- host
+```
+
+### 3. Network Security
+```bash
+# Connection security
+ssh -v host
+openssl s_client -connect host:port
+
+# Traffic analysis
+tcpdump -i any
+wireshark -i any
+```
+
+## System Analysis
+
+### 1. System Information
+```bash
+# System info
+uname -a
+cat /etc/os-release
+
+# Hardware info
+lscpu
+free -h
+```
+
+### 2. System Monitoring
+```bash
+# Resource usage
+top
+htop
+
+# System logs
+journalctl -f
+tail -f /var/log/syslog
+```
+
+### 3. Performance Analysis
+```bash
+# Performance tools
+vmstat 1
+iostat 1
+
+# Load average
+uptime
+w
+```
+
+## Security Best Practices
+
+### 1. Access Security
+```bash
+# Password policy
+passwd -S user
+chage -l user
+
+# Account security
+lastlog
+who
+```
+
+### 2. File Security
+```bash
+# Secure deletion
+shred -u file
+wipe -rf directory
+
+# File integrity
+sha256sum file
+md5sum file
+```
+
+### 3. System Security
+```bash
+# Security audit
+lynis audit system
+tiger
+
+# Vulnerability scan
+nmap -sV host
+nikto -h host
+```
+
+## Best Practices
+
+### 1. System Administration
+- Regular updates
+- Security patches
+- Backup strategy
+- Monitoring
+
+### 2. Security
+- Access control
+- File permissions
+- Network security
+- Audit logging
+
+### 3. Documentation
+- System inventory
+- Configuration management
+- Change control
+- Incident response
+
+## Additional Resources
+
+### 1. Man Pages
+```bash
+man bash
+man security
+man capabilities
+man audit
+```
+
+### 2. Documentation
+- Security Guide
+- System Administration
+- Best Practices
+- Troubleshooting
+
+### 3. Tools
+- Security tools
+- Monitoring tools
+- Analysis tools
+- Debug utilities

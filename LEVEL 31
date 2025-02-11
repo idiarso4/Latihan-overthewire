@@ -1,0 +1,321 @@
+# Bandit Level 30 → Level 31
+
+## Level Goal
+Menemukan password untuk level selanjutnya dengan mengkloning repository Git dan mengikuti instruksi untuk mengunggah file ke repository.
+
+## Detailed Command Breakdown
+
+### 1. SSH Connection
+```bash
+ssh bandit30@bandit.labs.overthewire.org -p 2220
+```
+
+### 2. Repository Setup
+```bash
+# Clone repository
+mktemp -d
+cd /tmp/tempdir
+git clone ssh://bandit30-git@localhost/home/bandit30-git/repo
+
+# Check instructions
+cat README.md
+```
+
+## Git Hooks
+
+### 1. Hook Basics
+```bash
+# List hooks
+ls -la .git/hooks/
+chmod +x .git/hooks/hook-name
+
+# Create hook
+cat > .git/hooks/pre-commit << 'EOF'
+#!/bin/bash
+# Hook content
+EOF
+```
+
+### 2. Common Hooks
+```bash
+# Pre-commit
+.git/hooks/pre-commit
+.git/hooks/prepare-commit-msg
+
+# Commit hooks
+.git/hooks/commit-msg
+.git/hooks/post-commit
+
+# Push hooks
+.git/hooks/pre-push
+.git/hooks/post-push
+```
+
+### 3. Server Hooks
+```bash
+# Receive hooks
+.git/hooks/pre-receive
+.git/hooks/update
+.git/hooks/post-receive
+
+# Reference hooks
+.git/hooks/pre-rebase
+.git/hooks/post-rewrite
+```
+
+## Hook Development
+
+### 1. Hook Structure
+```bash
+#!/bin/bash
+# Environment setup
+GIT_DIR=$(git rev-parse --git-dir)
+
+# Input handling
+read oldrev newrev refname
+
+# Exit codes
+exit 0  # Success
+exit 1  # Failure
+```
+
+### 2. Hook Environment
+```bash
+# Git variables
+GIT_DIR
+GIT_WORK_TREE
+
+# Hook input
+stdin
+environment variables
+
+# Hook output
+stdout
+stderr
+```
+
+### 3. Hook Testing
+```bash
+# Test hook
+.git/hooks/hook-name
+
+# Debug output
+set -x
+echo "Debug: $var" >&2
+
+# Test data
+echo "test" | .git/hooks/hook-name
+```
+
+## Automated Tasks
+
+### 1. Pre-commit Tasks
+```bash
+# Code formatting
+git diff --cached --name-only | xargs prettier
+git diff --cached --name-only | xargs clang-format
+
+# Code linting
+git diff --cached --name-only | xargs eslint
+git diff --cached --name-only | xargs pylint
+```
+
+### 2. Commit Tasks
+```bash
+# Message format
+grep -E "^(feat|fix|docs|style|refactor|test|chore):" "$1"
+
+# File checks
+git diff --cached --name-only | xargs file
+git diff --cached --name-only | xargs -I{} sh -c 'test -x "{}"'
+```
+
+### 3. Push Tasks
+```bash
+# Branch checks
+current=$(git symbolic-ref HEAD)
+protected="refs/heads/main"
+
+# Test suite
+npm test
+python -m pytest
+```
+
+## Security Checks
+
+### 1. Secret Detection
+```bash
+# Find secrets
+git diff --cached -G"password|secret|key"
+git diff --cached | grep -i "api.*key"
+
+# Block commits
+if grep -i "password" "$1"; then
+    exit 1
+fi
+```
+
+### 2. Permission Checks
+```bash
+# File permissions
+git diff --cached --name-only | while read file; do
+    if [ -x "$file" ]; then
+        exit 1
+    fi
+done
+
+# Directory permissions
+find . -type d -perm -o+w
+```
+
+### 3. Code Review
+```bash
+# Review checklist
+git diff --cached --name-only
+git diff --cached --check
+
+# Style guide
+git diff --cached | pylint --from-stdin
+git diff --cached | shellcheck -
+```
+
+## Hook Management
+
+### 1. Hook Installation
+```bash
+# Copy hooks
+cp hooks/* .git/hooks/
+chmod +x .git/hooks/*
+
+# Template hooks
+git config --global init.templateDir ~/.git-templates
+mkdir -p ~/.git-templates/hooks
+```
+
+### 2. Hook Configuration
+```bash
+# Enable hooks
+git config core.hooksPath .git/hooks
+git config --unset core.hooksPath
+
+# Disable hooks
+git commit --no-verify
+git push --no-verify
+```
+
+### 3. Hook Sharing
+```bash
+# Package hooks
+npm install husky
+yarn add husky
+
+# Configure hooks
+.husky/pre-commit
+.husky/commit-msg
+```
+
+## Performance Optimization
+
+### 1. Hook Execution
+```bash
+# Fast checks
+git diff --cached --name-only
+git diff --cached --shortstat
+
+# Parallel execution
+git diff --cached --name-only | xargs -P4 -I{} command {}
+```
+
+### 2. Cache Usage
+```bash
+# Cache results
+git config --global commit.template ~/.gitmessage
+git config --global core.excludesfile ~/.gitignore
+```
+
+### 3. Resource Usage
+```bash
+# Limit processes
+ulimit -u 100
+nice -n 19 command
+
+# Memory limits
+ulimit -v 512000
+```
+
+## Troubleshooting
+
+### 1. Hook Issues
+```bash
+# Debug mode
+set -x
+export GIT_TRACE=1
+
+# Log output
+exec 1>>/tmp/hook.log
+exec 2>>/tmp/hook.error
+```
+
+### 2. Permission Issues
+```bash
+# Fix permissions
+chmod +x .git/hooks/*
+chown -R user:group .git
+
+# Check paths
+which command
+command -v program
+```
+
+### 3. Environment Issues
+```bash
+# Check environment
+env
+printenv
+
+# Set variables
+export PATH="/usr/local/bin:$PATH"
+export GIT_DIR=$(git rev-parse --git-dir)
+```
+
+## Best Practices
+
+### 1. Hook Design
+- Fast execution
+- Clear errors
+- Clean exit
+- Good logging
+
+### 2. Security
+- Input validation
+- Secret detection
+- Permission checks
+- Audit logging
+
+### 3. Maintenance
+- Version control
+- Documentation
+- Testing
+- Monitoring
+
+## Additional Resources
+
+### 1. Man Pages
+```bash
+man githooks
+man git-hook
+man git-config
+man bash
+```
+
+### 2. Documentation
+- Git Hooks
+- Shell Scripting
+- Security Guide
+- Best Practices
+
+### 3. Tools
+- Hook managers
+- Code checkers
+- Security tools
+- Test runners

@@ -1,0 +1,319 @@
+# Bandit Level 29 → Level 30
+
+## Level Goal
+Menemukan password untuk level selanjutnya dengan mengkloning repository Git dan mencari password di berbagai branch dan tag yang ada.
+
+## Detailed Command Breakdown
+
+### 1. SSH Connection
+```bash
+ssh bandit29@bandit.labs.overthewire.org -p 2220
+```
+
+### 2. Repository Analysis
+```bash
+# Clone repository
+mktemp -d
+cd /tmp/tempdir
+git clone ssh://bandit29-git@localhost/home/bandit29-git/repo
+
+# List branches
+git branch -a
+git tag -l
+```
+
+## Branch Management
+
+### 1. Branch Operations
+```bash
+# Create branch
+git branch name
+git checkout -b name
+
+# Switch branch
+git checkout branch
+git switch branch
+
+# Delete branch
+git branch -d name
+git push origin --delete name
+```
+
+### 2. Branch Information
+```bash
+# List branches
+git branch -avv
+git show-branch --all
+
+# Branch details
+git rev-parse branch
+git merge-base branch1 branch2
+```
+
+### 3. Remote Branches
+```bash
+# Track remote
+git branch -u origin/branch
+git checkout --track origin/branch
+
+# Update remote
+git fetch origin
+git remote update
+```
+
+## Tag Management
+
+### 1. Tag Operations
+```bash
+# Create tag
+git tag name
+git tag -a name -m "message"
+
+# Delete tag
+git tag -d name
+git push --delete origin tag
+
+# Push tags
+git push --tags
+git push origin tag
+```
+
+### 2. Tag Information
+```bash
+# List tags
+git tag -l -n
+git show-ref --tags
+
+# Tag details
+git show tag
+git describe --tags
+```
+
+### 3. Tag Navigation
+```bash
+# Checkout tag
+git checkout tag
+git checkout -b branch tag
+
+# Compare tags
+git diff tag1 tag2
+git log tag1..tag2
+```
+
+## Branch Strategy
+
+### 1. Feature Branches
+```bash
+# Create feature
+git checkout -b feature
+git push -u origin feature
+
+# Update feature
+git rebase main
+git merge --no-ff feature
+```
+
+### 2. Release Branches
+```bash
+# Create release
+git checkout -b release/1.0
+git tag -a v1.0 -m "Release 1.0"
+
+# Finish release
+git merge release/1.0
+git branch -d release/1.0
+```
+
+### 3. Hotfix Branches
+```bash
+# Create hotfix
+git checkout -b hotfix
+git checkout main
+git merge hotfix
+
+# Clean up
+git branch -d hotfix
+git push origin :hotfix
+```
+
+## Branch Operations
+
+### 1. Merging
+```bash
+# Merge branch
+git merge branch
+git merge --no-ff branch
+
+# Handle conflicts
+git mergetool
+git merge --abort
+```
+
+### 2. Rebasing
+```bash
+# Rebase branch
+git rebase main
+git rebase -i HEAD~3
+
+# Continue rebase
+git rebase --continue
+git rebase --abort
+```
+
+### 3. Cherry-picking
+```bash
+# Pick commits
+git cherry-pick commit
+git cherry-pick branch~3..branch
+
+# Abort pick
+git cherry-pick --abort
+git cherry-pick --continue
+```
+
+## Branch Security
+
+### 1. Access Control
+```bash
+# Protected branches
+git config branch.main.protect true
+git config receive.denyDeletes true
+
+# Force push
+git push --force-with-lease
+git config receive.denyNonFastForwards true
+```
+
+### 2. Branch Policies
+```bash
+# Review policy
+git config branch.main.mergeoptions
+git config branch.autosetupmerge true
+
+# Push policy
+git config receive.denyCurrentBranch refuse
+```
+
+### 3. Hook Protection
+```bash
+# Pre-push hook
+.git/hooks/pre-push
+chmod +x .git/hooks/pre-push
+
+# Pre-receive hook
+.git/hooks/pre-receive
+chmod +x .git/hooks/pre-receive
+```
+
+## Performance Considerations
+
+### 1. Branch Cleanup
+```bash
+# Clean merged
+git branch --merged
+git branch -d $(git branch --merged)
+
+# Prune remote
+git remote prune origin
+git fetch --prune
+```
+
+### 2. Repository Size
+```bash
+# Check size
+git count-objects -vH
+du -sh .git
+
+# Optimize
+git gc --aggressive
+git repack -a -d
+```
+
+### 3. Operation Speed
+```bash
+# Fast clone
+git clone --depth 1
+git clone --single-branch
+
+# Fast checkout
+git checkout --no-track
+git sparse-checkout set
+```
+
+## Troubleshooting
+
+### 1. Branch Issues
+```bash
+# Fix branch
+git branch -f branch commit
+git reset --hard origin/branch
+
+# Recover branch
+git reflog
+git branch branch HEAD@{1}
+```
+
+### 2. Tag Issues
+```bash
+# Fix tags
+git tag -f tag
+git push -f origin tag
+
+# Recover tags
+git fsck --lost-found
+git tag new old
+```
+
+### 3. Merge Issues
+```bash
+# Fix conflicts
+git mergetool
+git checkout --ours file
+git checkout --theirs file
+
+# Abort merge
+git merge --abort
+git reset --hard HEAD
+```
+
+## Best Practices
+
+### 1. Branch Strategy
+- Clear naming
+- Regular cleanup
+- Protected main
+- Review process
+
+### 2. Tag Management
+- Version scheme
+- Release process
+- Tag signing
+- Documentation
+
+### 3. Security
+- Access control
+- Branch protection
+- Code review
+- Audit logs
+
+## Additional Resources
+
+### 1. Man Pages
+```bash
+man git-branch
+man git-tag
+man git-merge
+man git-rebase
+```
+
+### 2. Documentation
+- Branch Strategy
+- Tag Management
+- Security Guide
+- Best Practices
+
+### 3. Tools
+- Branch viewers
+- Merge tools
+- Security tools
+- CI/CD tools

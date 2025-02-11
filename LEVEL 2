@@ -97,15 +97,18 @@ cd /home/bandit1   # Change to specific directory
 ```
 
 ### 2. Numeric Permissions
-- 4 (read)
-- 2 (write)
-- 1 (execute)
+- `r` (read): permission untuk membaca isi file (4)
+- `w` (write): permission untuk menulis atau mengubah isi file (2)
+- `x` (execute): permission untuk menjalankan file sebagai program (1)
 - Contoh: 644 = rw-r--r--
 
 ### 3. Special Permissions
 - SUID (4000)
 - SGID (2000)
 - Sticky Bit (1000)
+- SUID (Set User ID) memungkinkan program untuk dijalankan dengan permission user yang mengowninya, bukan dengan permission user yang menjalankannya
+- SGID (Set Group ID) memungkinkan program untuk dijalankan dengan permission group yang mengowninya, bukan dengan permission group user yang menjalankannya
+- Sticky Bit digunakan untuk mengatur agar file yang dihapus tidak dapat dihapus oleh pengguna lain, kecuali root
 
 ## Advanced Shell Features
 

@@ -1,0 +1,297 @@
+# Bandit Level 26 → Level 27
+
+## Level Goal
+Menemukan password untuk level selanjutnya dengan menggunakan perintah setuid yang diberikan untuk mendapatkan akses ke repository Git.
+
+## Detailed Command Breakdown
+
+### 1. SSH Connection
+```bash
+ssh bandit26@bandit.labs.overthewire.org -p 2220
+```
+
+### 2. Git Operations
+```bash
+# Clone repository
+./bandit27-do git clone ssh://bandit27-git@localhost/home/bandit27-git/repo
+
+# View repository info
+git status
+git log
+git show
+```
+
+## Git Basics
+
+### 1. Repository Setup
+```bash
+# Initialize repository
+git init
+git init --bare
+
+# Clone repository
+git clone url
+git clone --depth 1 url
+```
+
+### 2. Basic Operations
+```bash
+# Status check
+git status
+git diff
+
+# Stage changes
+git add file
+git add -A
+
+# Commit changes
+git commit -m "message"
+```
+
+### 3. History View
+```bash
+# View log
+git log
+git log --oneline
+git log --graph
+
+# Show changes
+git show commit
+git diff commit1 commit2
+```
+
+## Git Configuration
+
+### 1. User Settings
+```bash
+# Set user info
+git config --global user.name "name"
+git config --global user.email "email"
+
+# List settings
+git config --list
+git config --list --show-origin
+```
+
+### 2. Repository Config
+```bash
+# Set remote
+git remote add origin url
+git remote set-url origin url
+
+# List remotes
+git remote -v
+git remote show origin
+```
+
+### 3. System Config
+```bash
+# Global config
+git config --global core.editor vim
+git config --global merge.tool vimdiff
+
+# Local config
+git config --local core.ignorecase true
+```
+
+## Branch Management
+
+### 1. Branch Operations
+```bash
+# List branches
+git branch
+git branch -a
+
+# Create branch
+git branch name
+git checkout -b name
+
+# Delete branch
+git branch -d name
+git push origin --delete name
+```
+
+### 2. Branch Navigation
+```bash
+# Switch branch
+git checkout branch
+git switch branch
+
+# Merge branch
+git merge branch
+git rebase branch
+```
+
+### 3. Remote Branches
+```bash
+# Track remote
+git branch -u origin/branch
+git push -u origin branch
+
+# Update remote
+git fetch origin
+git pull origin branch
+```
+
+## Repository Management
+
+### 1. Remote Operations
+```bash
+# Add remote
+git remote add name url
+git remote rename old new
+
+# Update remote
+git fetch remote
+git pull remote branch
+
+# Push changes
+git push remote branch
+git push --force remote branch
+```
+
+### 2. Tag Management
+```bash
+# Create tag
+git tag name
+git tag -a name -m "message"
+
+# List tags
+git tag
+git tag -l "pattern"
+
+# Push tags
+git push origin tag
+git push --tags
+```
+
+### 3. Submodule Handling
+```bash
+# Add submodule
+git submodule add url path
+git submodule init
+
+# Update submodules
+git submodule update
+git submodule update --remote
+
+# Remove submodule
+git submodule deinit path
+git rm path
+```
+
+## Security Considerations
+
+### 1. Authentication
+```bash
+# SSH keys
+ssh-keygen -t ed25519
+ssh-copy-id user@host
+
+# Credential helper
+git config --global credential.helper cache
+git config --global credential.helper store
+```
+
+### 2. Access Control
+```bash
+# File permissions
+chmod 600 key
+chmod 700 .git
+
+# Repository permissions
+git config core.sharedRepository group
+chmod -R g+rw .git
+```
+
+### 3. Sensitive Data
+```bash
+# Remove sensitive data
+git filter-branch --force
+git filter-repo
+
+# Clean history
+git gc
+git prune
+```
+
+## Troubleshooting
+
+### 1. Common Issues
+```bash
+# Fix conflicts
+git mergetool
+git rebase --continue
+
+# Reset changes
+git reset HEAD file
+git checkout -- file
+
+# Clean working dir
+git clean -fd
+git reset --hard
+```
+
+### 2. Repository Repair
+```bash
+# Check integrity
+git fsck
+git gc --prune=now
+
+# Recover commits
+git reflog
+git cherry-pick commit
+```
+
+### 3. Network Issues
+```bash
+# Debug connection
+GIT_TRACE=1 git fetch
+ssh -vT git@host
+
+# Fix SSL issues
+git config http.sslVerify false
+export GIT_SSL_NO_VERIFY=1
+```
+
+## Best Practices
+
+### 1. Commit Strategy
+- Clear messages
+- Atomic commits
+- Feature branches
+- Regular updates
+
+### 2. Security
+- SSH keys
+- Access control
+- Sensitive data
+- Clean history
+
+### 3. Maintenance
+- Regular cleanup
+- Backup strategy
+- Documentation
+- Review process
+
+## Additional Resources
+
+### 1. Man Pages
+```bash
+man git
+man git-config
+man git-remote
+man ssh-keygen
+```
+
+### 2. Documentation
+- Git Guide
+- Security Guide
+- Best Practices
+- Workflow Guide
+
+### 3. Tools
+- Git utilities
+- SSH tools
+- Security scanners
+- Repository browsers

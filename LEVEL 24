@@ -1,0 +1,273 @@
+# Bandit Level 23 → Level 24
+
+## Level Goal
+Menemukan password untuk level selanjutnya dengan membuat script yang akan dijalankan secara otomatis oleh cron. Script harus mengambil password dari file yang hanya bisa dibaca oleh bandit24.
+
+## Detailed Command Breakdown
+
+### 1. SSH Connection
+```bash
+ssh bandit23@bandit.labs.overthewire.org -p 2220
+```
+
+### 2. Script Creation
+```bash
+# Create directory
+mkdir -p /tmp/mydir
+cd /tmp/mydir
+
+# Create script
+cat > script.sh << 'EOF'
+#!/bin/bash
+cat /etc/bandit_pass/bandit24 > /tmp/mydir/password
+EOF
+
+# Set permissions
+chmod 755 script.sh
+```
+
+## Script Automation
+
+### 1. Directory Setup
+```bash
+# Create working directory
+mktemp -d
+chmod 777 /tmp/mydir
+
+# Monitor directory
+inotifywait -m /tmp/mydir
+watch -n 1 ls -l /tmp/mydir
+```
+
+### 2. File Permissions
+```bash
+# Set script permissions
+chmod +x script.sh
+chmod 755 script.sh
+
+# Set directory permissions
+chmod 777 directory
+chmod g+s directory
+```
+
+### 3. Process Monitoring
+```bash
+# Watch processes
+ps aux | grep script
+pgrep -f script
+
+# Monitor file changes
+tail -f /tmp/mydir/password
+inotifywait -m /tmp/mydir
+```
+
+## Automated Tasks
+
+### 1. Cron Setup
+```bash
+# Create cron job
+echo "* * * * * /path/to/script.sh" | crontab -
+
+# List cron jobs
+crontab -l
+ls /etc/cron.d/
+```
+
+### 2. Script Execution
+```bash
+# Run script
+./script.sh
+bash script.sh
+
+# Debug execution
+bash -x script.sh
+set -x
+```
+
+### 3. Output Handling
+```bash
+# Redirect output
+script.sh > output 2>&1
+
+# Monitor output
+tail -f output
+watch cat output
+```
+
+## File System Operations
+
+### 1. Directory Management
+```bash
+# Create secure directory
+install -d -m 700 directory
+mkdir -m 700 directory
+
+# Clean up
+rm -rf directory/*
+find directory -delete
+```
+
+### 2. File Operations
+```bash
+# Create files
+touch file
+: > file
+
+# Copy files
+cp -p source dest
+install -m 644 source dest
+```
+
+### 3. Permission Management
+```bash
+# Change ownership
+chown user:group file
+chown -R user:group directory
+
+# Set permissions
+chmod 600 file
+chmod -R 700 directory
+```
+
+## Security Considerations
+
+### 1. Script Security
+```bash
+# Set secure path
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# Set umask
+umask 077
+
+# Clear environment
+env -i script.sh
+```
+
+### 2. File Security
+```bash
+# Secure file creation
+mktemp
+mktemp -d
+
+# Secure permissions
+chmod 600 sensitive_file
+chmod 700 private_directory
+```
+
+### 3. Process Security
+```bash
+# Run as different user
+sudo -u user command
+su - user -c command
+
+# Set resource limits
+ulimit -n 1024
+nice -n 19 command
+```
+
+## Monitoring and Logging
+
+### 1. Process Monitoring
+```bash
+# Watch processes
+ps aux | grep script
+top -p $(pgrep -d',' -f script)
+
+# Resource usage
+pidstat -p PID
+sar -P ALL
+```
+
+### 2. File Monitoring
+```bash
+# Watch file changes
+inotifywait -m directory
+tail -f logfile
+
+# Track access
+auditctl -w file -p rwxa
+ausearch -f file
+```
+
+### 3. System Logging
+```bash
+# View logs
+tail -f /var/log/syslog
+journalctl -f
+
+# Filter logs
+grep script /var/log/syslog
+journalctl -u service
+```
+
+## Troubleshooting
+
+### 1. Common Issues
+- Permission denied
+- File not found
+- Process killed
+- Resource limits
+
+### 2. Solutions
+```bash
+# Check permissions
+ls -l script.sh
+namei -l script.sh
+
+# Debug execution
+bash -x script.sh
+strace ./script.sh
+```
+
+### 3. Debugging
+```bash
+# Process info
+ps aux | grep script
+lsof -p PID
+
+# System resources
+free -h
+df -h
+```
+
+## Best Practices
+
+### 1. Script Writing
+- Use shellcheck
+- Error handling
+- Secure permissions
+- Clean exit
+
+### 2. Security
+- Minimal privileges
+- Input validation
+- Secure paths
+- Clean environment
+
+### 3. Maintenance
+- Regular monitoring
+- Log rotation
+- Cleanup routines
+- Documentation
+
+## Additional Resources
+
+### 1. Man Pages
+```bash
+man cron
+man bash
+man chmod
+man mktemp
+```
+
+### 2. Documentation
+- Shell Scripting
+- Cron Jobs
+- File Permissions
+- Security Guide
+
+### 3. Tools
+- Process monitors
+- File watchers
+- System loggers
+- Debug utilities

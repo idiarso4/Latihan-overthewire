@@ -1,0 +1,277 @@
+# Bandit Level 27 → Level 28
+
+## Level Goal
+Menemukan password untuk level selanjutnya dengan mengkloning repository Git dan mencari password di dalamnya.
+
+## Detailed Command Breakdown
+
+### 1. SSH Connection
+```bash
+ssh bandit27@bandit.labs.overthewire.org -p 2220
+```
+
+### 2. Repository Access
+```bash
+# Create temp directory
+mktemp -d
+cd /tmp/tempdir
+
+# Clone repository
+git clone ssh://bandit27-git@localhost/home/bandit27-git/repo
+
+# Inspect contents
+ls -la repo/
+cat repo/README
+```
+
+## Git Repository Inspection
+
+### 1. Basic Inspection
+```bash
+# List files
+git ls-files
+git ls-tree HEAD
+
+# Show file content
+git show HEAD:file
+git cat-file -p HEAD
+```
+
+### 2. History Analysis
+```bash
+# View commits
+git log --all
+git log --patch
+
+# Search history
+git log --grep="pattern"
+git log -S "string"
+```
+
+### 3. Object Examination
+```bash
+# List objects
+git rev-list --objects --all
+git fsck --full
+
+# View object
+git cat-file -t object
+git cat-file -p object
+```
+
+## Data Extraction
+
+### 1. File Recovery
+```bash
+# Restore file
+git checkout commit -- file
+git restore --source=commit file
+
+# Undelete file
+git checkout HEAD^ -- file
+git rev-list -n 1 HEAD -- file
+```
+
+### 2. Content Search
+```bash
+# Search content
+git grep pattern
+git grep -l pattern
+
+# Search history
+git log -p -S pattern
+git rev-list --all | xargs git grep pattern
+```
+
+### 3. Blob Analysis
+```bash
+# List blobs
+git rev-list --objects --all
+git verify-pack -v .git/objects/pack/*.idx
+
+# Extract blob
+git cat-file blob hash
+git unpack-file blob
+```
+
+## Repository Analysis
+
+### 1. Structure Analysis
+```bash
+# View structure
+git ls-tree -r HEAD
+git rev-parse --git-dir
+
+# Check refs
+git show-ref
+git for-each-ref
+```
+
+### 2. Pack Analysis
+```bash
+# List packs
+git verify-pack -v pack
+git show-index < pack
+
+# Unpack objects
+git unpack-objects < pack
+git index-pack pack
+```
+
+### 3. Reference Analysis
+```bash
+# List refs
+git show-ref
+git for-each-ref
+
+# Check symbolic refs
+git symbolic-ref HEAD
+git rev-parse HEAD
+```
+
+## Advanced Inspection
+
+### 1. Commit Analysis
+```bash
+# View commit
+git show commit
+git rev-list --objects commit
+
+# Compare commits
+git diff commit1 commit2
+git cherry commit1 commit2
+```
+
+### 2. Branch Analysis
+```bash
+# List branches
+git branch -a -v
+git for-each-ref refs/heads
+
+# Find merge base
+git merge-base branch1 branch2
+git branch --contains commit
+```
+
+### 3. Tag Analysis
+```bash
+# List tags
+git tag -l -n
+git show-ref --tags
+
+# View tag
+git show tag
+git rev-parse tag
+```
+
+## Security Analysis
+
+### 1. Access Control
+```bash
+# Check permissions
+ls -l .git
+git config core.sharedRepository
+
+# View config
+git config --list
+git config --get-regexp user.*
+```
+
+### 2. Authentication
+```bash
+# SSH config
+git config --get remote.origin.url
+ssh -Tv git@host
+
+# Credential helper
+git config credential.helper
+git credential fill
+```
+
+### 3. Sensitive Data
+```bash
+# Find secrets
+git grep -l password
+git log -p | grep -i password
+
+# Clean history
+git filter-branch --index-filter
+git filter-repo
+```
+
+## Troubleshooting
+
+### 1. Repository Issues
+```bash
+# Check integrity
+git fsck
+git gc --prune=now
+
+# Repair repo
+git prune
+git repack -a -d
+```
+
+### 2. Object Issues
+```bash
+# Find missing
+git fsck --lost-found
+git prune --expire now
+
+# Recover objects
+git reflog expire
+git gc --prune=now
+```
+
+### 3. Reference Issues
+```bash
+# Fix refs
+git update-ref -d ref
+git gc --prune=now
+
+# Rebuild refs
+git for-each-ref
+git pack-refs --all
+```
+
+## Best Practices
+
+### 1. Repository Management
+- Regular maintenance
+- Integrity checks
+- Security audits
+- Clean history
+
+### 2. Data Handling
+- Secure storage
+- Access control
+- Data cleanup
+- Backup strategy
+
+### 3. Security
+- Authentication
+- Authorization
+- Secret management
+- Audit logging
+
+## Additional Resources
+
+### 1. Man Pages
+```bash
+man git-log
+man git-show
+man git-grep
+man git-cat-file
+```
+
+### 2. Documentation
+- Git Internals
+- Repository Management
+- Security Guide
+- Best Practices
+
+### 3. Tools
+- Git utilities
+- Repository browsers
+- Security scanners
+- Analysis tools
