@@ -1,110 +1,281 @@
 # Bandit Level 13 → Level 14
 
 ## Level Goal
-Password untuk level selanjutnya tersimpan di `/etc/bandit_pass/bandit14` dan hanya bisa dibaca oleh user bandit14. Pada level ini, kita tidak mendapatkan password secara langsung, melainkan sebuah private SSH key yang bisa digunakan untuk login ke level berikutnya.
+Menemukan password untuk level selanjutnya dengan melakukan login ke level berikutnya menggunakan private SSH key yang tersedia di home directory.
 
-## Langkah Penyelesaian
+## Detailed Command Breakdown
 
-1. Login ke server menggunakan SSH:
-   ```bash
-   ssh bandit13@bandit.labs.overthewire.org -p 2220
-   ```
-   (Gunakan password yang didapat dari level sebelumnya)
+### 1. SSH Connection
+```bash
+ssh bandit13@bandit.labs.overthewire.org -p 2220
+```
 
-2. Verifikasi keberadaan private key:
-   ```bash
-   ls -l
-   ```
-   Anda akan melihat file `sshkey.private`
+### 2. SSH Key Authentication
+```bash
+# View SSH key
+ls -l sshkey.private
 
-3. Gunakan private key untuk login sebagai bandit14 ke localhost:
-   ```bash
-   ssh -i sshkey.private bandit14@localhost
-   ```
-   
-   Note: Jika ada warning tentang permissions, jalankan:
-   ```bash
-   chmod 600 sshkey.private
-   ```
+# Set correct permissions
+chmod 600 sshkey.private
 
-4. Setelah login sebagai bandit14, baca password:
-   ```bash
-   cat /etc/bandit_pass/bandit14
-   ```
+# Connect using key
+ssh -i sshkey.private bandit14@localhost
+```
 
-5. Salin password dan logout (dua kali):
-   ```bash
-   exit  # keluar dari session bandit14
-   exit  # keluar dari session bandit13
-   ```
+## SSH Key Management
 
-## Penjelasan Teknis
+### 1. Key Generation
+```bash
+# Generate key pair
+ssh-keygen -t rsa -b 4096
+ssh-keygen -t ed25519
 
-### SSH Key Authentication
-- Metode autentikasi yang lebih aman dari password
-- Menggunakan pasangan key: public dan private
-- Private key harus dijaga kerahasiaannya
-- Public key bisa dishare
+# With custom file
+ssh-keygen -f ~/.ssh/custom_key
 
-### Komponen SSH Key
-1. Private Key
-   - Harus dijaga kerahasiaannya
-   - Permissions harus 600 (rw-------)
-   - Digunakan untuk autentikasi
+# With passphrase
+ssh-keygen -p -f key_file
+```
 
-2. Public Key
-   - Bisa dishare
-   - Biasanya disimpan di ~/.ssh/authorized_keys
-   - Digunakan untuk verifikasi
+### 2. Key Distribution
+```bash
+# Copy public key
+ssh-copy-id user@host
+ssh-copy-id -i key.pub user@host
 
-### SSH Key Permissions
-- Private key: 600 (rw-------)
-- Public key: 644 (rw-r--r--)
-- .ssh directory: 700 (rwx------)
+# Manual copy
+cat key.pub >> ~/.ssh/authorized_keys
+chmod 600 ~/.ssh/authorized_keys
+```
 
-## Tips
-- Selalu set permission yang benar
-- Jangan share private key
-- Backup private key dengan aman
-- Gunakan passphrase untuk extra security
+### 3. Key Conversion
+```bash
+# Convert formats
+ssh-keygen -p -m PEM -f key
+ssh-keygen -e -m PKCS8 -f key.pub
 
-## Konsep yang Dipelajari
-- SSH key authentication
-- File permissions
-- Local SSH connection
-- Secure key handling
+# Change passphrase
+ssh-keygen -p -f key_file
+```
+
+## SSH Configuration
+
+### 1. Client Config
+```bash
+# ~/.ssh/config
+Host server
+    HostName example.com
+    User username
+    Port 22
+    IdentityFile ~/.ssh/id_rsa
+```
+
+### 2. Server Config
+```bash
+# /etc/ssh/sshd_config
+PermitRootLogin no
+PasswordAuthentication no
+PubkeyAuthentication yes
+AuthorizedKeysFile .ssh/authorized_keys
+```
+
+### 3. Security Settings
+```bash
+# Key permissions
+chmod 700 ~/.ssh
+chmod 600 ~/.ssh/id_rsa
+chmod 644 ~/.ssh/id_rsa.pub
+
+# Directory permissions
+find ~/.ssh -type f -exec chmod 600 {} \;
+find ~/.ssh -type d -exec chmod 700 {} \;
+```
+
+## Authentication Methods
+
+### 1. Public Key
+```bash
+# Basic connection
+ssh -i key_file user@host
+
+# With config
+ssh server_name
+
+# Force public key
+ssh -o PubkeyAuthentication=yes host
+```
+
+### 2. Password
+```bash
+# Force password
+ssh -o PubkeyAuthentication=no host
+
+# Interactive
+ssh -o PasswordAuthentication=yes host
+
+# Batch mode
+ssh -o BatchMode=yes host
+```
+
+### 3. Certificate
+```bash
+# Generate CA
+ssh-keygen -f ca_key
+
+# Sign key
+ssh-keygen -s ca_key -I key_id pubkey.pub
+
+# Use certificate
+ssh -i signed_key host
+```
+
+## Advanced SSH Features
+
+### 1. Port Forwarding
+```bash
+# Local forwarding
+ssh -L 8080:localhost:80 host
+
+# Remote forwarding
+ssh -R 8080:localhost:80 host
+
+# Dynamic forwarding
+ssh -D 1080 host
+```
+
+### 2. Connection Options
+```bash
+# Compression
+ssh -C host
+
+# Verbose output
+ssh -v host
+ssh -vv host
+ssh -vvv host
+
+# Custom cipher
+ssh -c aes256-gcm@openssh.com host
+```
+
+### 3. Session Management
+```bash
+# Keep alive
+ssh -o ServerAliveInterval=60 host
+
+# Control master
+ssh -M -S ctrl_path host
+ssh -S ctrl_path -O check host
+```
+
+## Security Best Practices
+
+### 1. Key Protection
+```bash
+# Generate strong key
+ssh-keygen -t ed25519 -a 100
+
+# Use key agent
+eval $(ssh-agent)
+ssh-add ~/.ssh/id_ed25519
+
+# Lock agent
+ssh-add -x
+```
+
+### 2. Access Control
+```bash
+# Restrict commands
+command="ls" ssh-rsa AAAA...
+
+# Restrict source
+from="192.168.1.*" ssh-rsa AAAA...
+
+# Time restriction
+permitopen="sun-fri" ssh-rsa AAAA...
+```
+
+### 3. Monitoring
+```bash
+# Log attempts
+grep "Failed password" /var/log/auth.log
+
+# Active connections
+who | grep pts
+
+# SSH processes
+ps aux | grep ssh
+```
 
 ## Troubleshooting
-1. Permission denied:
-   ```bash
-   chmod 600 sshkey.private
-   ```
 
-2. Key tidak valid:
-   - Periksa format key
-   - Periksa line endings
-   - Pastikan tidak corrupt
+### 1. Common Issues
+- Permission errors
+- Key format problems
+- Connection refused
+- Authentication failure
 
-3. Connection refused:
-   - Periksa SSH service
-   - Periksa hostname
-   - Periksa port
+### 2. Solutions
+```bash
+# Debug connection
+ssh -v user@host
 
-## Keamanan SSH Key
-1. Jangan pernah:
-   - Share private key
-   - Set permissions terlalu longgar
-   - Simpan tanpa enkripsi
-   - Kirim via email/chat
+# Check permissions
+ls -la ~/.ssh/
 
-2. Selalu:
-   - Backup private key
-   - Gunakan passphrase
-   - Monitor akses
-   - Rotate keys secara berkala
+# Test connectivity
+nc -vz host 22
+```
 
-## Penggunaan di Dunia Nyata
-- Git repository access
-- Server administration
-- Automated deployments
-- Secure file transfer
+### 3. Debugging
+```bash
+# Server logs
+tail -f /var/log/auth.log
+
+# Client debug
+SSH_DEBUG=1 ssh host
+
+# Key verification
+ssh-keygen -l -f key_file
+```
+
+## Best Practices
+
+### 1. Key Management
+- Use strong keys
+- Protect private keys
+- Regular rotation
+- Backup securely
+
+### 2. Security
+- Disable password auth
+- Use key passphrase
+- Monitor access
+- Update regularly
+
+### 3. Organization
+- Name keys clearly
+- Document access
+- Clean old keys
+- Audit regularly
+
+## Additional Resources
+
+### 1. Man Pages
+```bash
+man ssh
+man ssh-keygen
+man sshd_config
+man authorized_keys
+```
+
+### 2. Documentation
+- OpenSSH Guide
+- Security Best Practices
+- Key Management
+- Access Control
+
+### 3. Tools
+- ssh-agent
+- ssh-add
+- ssh-copy-id
+- ssh-keyscan

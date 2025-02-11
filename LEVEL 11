@@ -1,97 +1,284 @@
 # Bandit Level 10 → Level 11
 
 ## Level Goal
-Menemukan password untuk level selanjutnya yang tersimpan dalam file `data.txt`. File tersebut berisi data yang diencode menggunakan base64.
+Menemukan password untuk level selanjutnya yang tersimpan dalam file `data.txt`, yang berisi data terenkripsi base64.
 
-## Langkah Penyelesaian
+## Detailed Command Breakdown
 
-1. Login ke server menggunakan SSH:
-   ```bash
-   ssh bandit10@bandit.labs.overthewire.org -p 2220
-   ```
-   (Gunakan password yang didapat dari level sebelumnya)
+### 1. SSH Connection
+```bash
+ssh bandit10@bandit.labs.overthewire.org -p 2220
+```
 
-2. Verifikasi keberadaan dan lihat isi file data.txt:
-   ```bash
-   ls -l data.txt
-   cat data.txt
-   ```
-   Anda akan melihat string yang diencode dengan base64
+### 2. Base64 Decoding
+```bash
+# Basic decoding
+base64 -d data.txt
 
-3. Decode data menggunakan perintah base64:
-   ```bash
-   base64 -d data.txt
-   ```
-   
-   Penjelasan command:
-   - `base64`: utility untuk encode/decode base64
-   - `-d`: opsi untuk decode (default adalah encode)
+# With error checking
+base64 -d data.txt 2>/dev/null
 
-4. Password akan muncul dalam bentuk plain text
+# Save to file
+base64 -d data.txt > decoded.txt
+```
 
-5. Salin password dan logout:
-   ```bash
-   exit
-   ```
+## Base64 Encoding/Decoding
 
-## Penjelasan Teknis
+### 1. Basic Operations
+```bash
+# Encoding
+base64 file.txt
 
-### Base64 Encoding
-- Metode encoding binary-to-text
-- Menggunakan 64 karakter (A-Z, a-z, 0-9, +, /)
-- Padding menggunakan '='
-- Sering digunakan di email dan web
+# Decoding
+base64 -d encoded.txt
 
-### Karakteristik Base64
-- Output selalu karakter ASCII printable
-- Setiap 3 byte data menjadi 4 karakter base64
-- Ukuran output ~33% lebih besar dari input
-- Tidak ada enkripsi, hanya encoding
+# Wrap output
+base64 -w 0 file.txt  # No wrapping
+base64 -w 76 file.txt # Standard wrap
+```
 
-### Perintah Base64
-Opsi yang berguna:
-- `-d` atau `--decode`: decode data
-- `-i`: baca dari file
-- `-w`: wrap lines at cols
-- `--ignore-garbage`: abaikan karakter non-base64
+### 2. Input/Output Options
+```bash
+# From stdin
+echo "Hello" | base64
 
-## Tips
-- Periksa apakah string adalah base64 valid
-- Perhatikan padding dengan '='
-- Base64 bukan enkripsi, hanya encoding
-- Gunakan `-w0` untuk output tanpa line breaks
+# To file
+base64 input.txt > encoded.txt
 
-## Konsep yang Dipelajari
-- Base64 encoding/decoding
-- Text encoding schemes
-- Command line text processing
-- Data representation
+# Multiple files
+cat file1 file2 | base64
+```
 
-## Variasi Command yang Bisa Digunakan
-1. Decode dan simpan ke file:
-   ```bash
-   base64 -d data.txt > decoded.txt
-   ```
+### 3. Error Handling
+```bash
+# Ignore garbage
+base64 -i encoded.txt
 
-2. Pipe dengan cat:
-   ```bash
-   cat data.txt | base64 -d
-   ```
+# Check validity
+base64 -d encoded.txt >/dev/null 2>&1
 
-3. Dengan wrapping yang custom:
-   ```bash
-   base64 -d -w0 data.txt
-   ```
+# Debug output
+base64 -d -v encoded.txt
+```
 
-## Penggunaan Base64 di Dunia Nyata
-- Email attachments
-- Web data transmission
-- Storing binary data in text format
-- URL encoding
-- SSL certificates
+## Text Encoding
 
-## Catatan Keamanan
-- Base64 BUKAN metode enkripsi
-- Tidak memberikan keamanan
-- Mudah di-decode
-- Gunakan untuk encoding, bukan security
+### 1. Character Sets
+```bash
+# ASCII to Base64
+echo -n "ASCII" | base64
+
+# UTF-8 to Base64
+echo -n "UTF-8 ♥" | base64
+
+# Binary to Base64
+cat binary_file | base64
+```
+
+### 2. URL Safe Encoding
+```bash
+# URL safe characters
+base64url encode.txt
+
+# Custom alphabet
+base64 -w 0 file | tr '+/' '-_'
+
+# Remove padding
+base64 file | tr -d '='
+```
+
+### 3. Multiple Encodings
+```bash
+# Double encoding
+echo "text" | base64 | base64
+
+# Mixed encodings
+echo "text" | base64 | hex
+```
+
+## Data Processing
+
+### 1. File Operations
+```bash
+# Split large files
+split -b 1M file.txt
+base64 x* > encoded.txt
+
+# Join encoded parts
+cat encoded_* | base64 -d
+
+# Stream processing
+tail -f log | base64
+```
+
+### 2. Format Conversion
+```bash
+# Hex to Base64
+xxd -p file | tr -d '\n' | base64
+
+# Binary to Base64
+dd if=/dev/urandom bs=1M count=1 | base64
+
+# Image to Base64
+base64 image.jpg > image.b64
+```
+
+### 3. Data Validation
+```bash
+# Check encoding
+file encoded.txt
+
+# Validate format
+base64 -d file && echo "Valid"
+
+# Check padding
+grep -E '^[A-Za-z0-9+/]*={0,2}$' file
+```
+
+## Security Applications
+
+### 1. Data Transfer
+```bash
+# Secure copy
+base64 secret.txt | ssh user@host 'base64 -d > secret.txt'
+
+# Email attachment
+base64 attachment | mail -s "Subject" user@domain
+
+# Web safe transfer
+curl -d "$(base64 file)" url
+```
+
+### 2. Encryption
+```bash
+# Combine with encryption
+openssl enc -aes-256-cbc | base64
+
+# With compression
+gzip -c file | base64
+
+# With checksums
+sha256sum file | base64
+```
+
+### 3. Authentication
+```bash
+# Basic auth header
+echo -n "user:pass" | base64
+
+# JWT tokens
+echo -n "header.payload" | base64url
+
+# Certificate encoding
+openssl x509 -in cert.pem -outform DER | base64
+```
+
+## Performance Optimization
+
+### 1. Large Files
+```bash
+# Parallel processing
+parallel base64 ::: files*
+
+# Chunked processing
+split -b 100M file.txt chunk_
+for f in chunk_*; do base64 "$f" & done
+```
+
+### 2. Memory Usage
+```bash
+# Stream processing
+cat large_file | base64 -w 0
+
+# Buffer size
+dd bs=1M if=file | base64
+
+# Resource limits
+ulimit -v 1000000
+```
+
+### 3. Error Recovery
+```bash
+# Retry logic
+while ! base64 -d file; do sleep 1; done
+
+# Partial recovery
+dd skip=1000 count=1000 if=file | base64
+
+# Error logging
+base64 file 2>errors.log
+```
+
+## Best Practices
+
+### 1. Data Handling
+- Validate input
+- Check output
+- Handle errors
+- Use appropriate tools
+
+### 2. Security
+- Secure transmission
+- Data validation
+- Error handling
+- Resource limits
+
+### 3. Performance
+- Optimize for size
+- Handle large files
+- Use streaming
+- Monitor resources
+
+## Troubleshooting
+
+### 1. Common Issues
+- Invalid padding
+- Character encoding
+- Memory limits
+- Performance
+
+### 2. Solutions
+```bash
+# Fix padding
+base64 file | tr -d '\n' | fold -w 76
+
+# Handle encoding
+iconv -f utf-8 -t ascii file | base64
+
+# Memory issues
+base64 < file > encoded.txt
+```
+
+### 3. Debugging
+```bash
+# Check format
+base64 -d -v file
+
+# Validate input
+file encoded.txt
+
+# Test output
+base64 -d file | file -
+```
+
+## Additional Resources
+
+### 1. Man Pages
+```bash
+man base64
+man base64url
+man iconv
+man dd
+```
+
+### 2. Documentation
+- RFC 4648 (Base64)
+- MIME specifications
+- Character encodings
+- Security standards
+
+### 3. Tools
+- OpenSSL
+- coreutils
+- text processors
+- encoding tools

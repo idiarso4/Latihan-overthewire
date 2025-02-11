@@ -1,109 +1,305 @@
 # Bandit Level 12 → Level 13
 
 ## Level Goal
-Menemukan password untuk level selanjutnya yang tersimpan dalam file `data.txt`. File ini merupakan hexdump dari file yang telah dikompresi berulang kali.
+Menemukan password untuk level selanjutnya yang tersimpan dalam file `data.txt`, yang merupakan file hexdump dari file yang telah dikompresi berulang kali. Untuk level ini diperlukan dekompresi berulang.
 
-## Langkah Penyelesaian
+## Detailed Command Breakdown
 
-1. Login ke server menggunakan SSH:
-   ```bash
-   ssh bandit12@bandit.labs.overthewire.org -p 2220
-   ```
-   (Gunakan password yang didapat dari level sebelumnya)
+### 1. SSH Connection
+```bash
+ssh bandit12@bandit.labs.overthewire.org -p 2220
+```
 
-2. Buat direktori temporer dan pindahkan file:
-   ```bash
-   cd /tmp
-   mktemp -d
-   cd /tmp/tmp.XXXXXXXXXX  # Sesuaikan dengan nama direktori yang dibuat
-   cp ~/data.txt .
-   ```
+### 2. File Analysis and Decompression
+```bash
+# Create working directory
+mkdir /tmp/mywork
+cd /tmp/mywork
+cp ~/data.txt .
 
-3. Reverse hexdump ke binary:
-   ```bash
-   xxd -r data.txt > data.bin
-   file data.bin
-   ```
+# Reverse hexdump
+xxd -r data.txt > data.bin
 
-4. Dekompresi berulang sesuai tipe file:
-   ```bash
-   # Untuk file gzip
-   mv data.bin data.gz
-   gzip -d data.gz
-   
-   # Untuk file bzip2
-   mv data data.bz2
-   bzip2 -d data.bz2
-   
-   # Untuk file tar
-   mv data data.tar
-   tar xf data.tar
-   ```
-   
-   Ulangi langkah ini sesuai hasil perintah `file`
+# Check file type
+file data.bin
 
-5. Setelah semua dekompresi selesai, baca file teks akhir:
-   ```bash
-   cat data  # atau nama file akhir
-   ```
+# Decompress based on file type
+# For gzip:
+mv data.bin data.gz
+gzip -d data.gz
 
-6. Salin password dan logout:
-   ```bash
-   exit
-   ```
+# For bzip2:
+mv data data.bz2
+bzip2 -d data.bz2
 
-## Penjelasan Teknis
+# For tar:
+mv data data.tar
+tar xf data.tar
+```
 
-### Hexdump
-- Representasi hex dari data binary
-- Format: offset + hex values + ASCII representation
-- Dapat di-reverse dengan xxd -r
+## File Compression Tools
 
-### Format Kompresi yang Umum
-1. gzip (.gz)
-   - Kompresi GNU
-   - Dekompresi: gzip -d
+### 1. Gzip
+```bash
+# Compress
+gzip file.txt
+gzip -9 file.txt     # Maximum compression
+gzip -1 file.txt     # Fastest compression
 
-2. bzip2 (.bz2)
-   - Kompresi yang lebih baik dari gzip
-   - Dekompresi: bzip2 -d
+# Decompress
+gzip -d file.gz
+gunzip file.gz
 
-3. tar (.tar)
-   - Archiver, bukan kompresi
-   - Ekstrak: tar xf
+# Test integrity
+gzip -t file.gz
+```
 
-### Perintah File
-- Mendeteksi tipe file
-- Membaca "magic numbers"
-- Sangat berguna untuk file unknown
+### 2. Bzip2
+```bash
+# Compress
+bzip2 file.txt
+bzip2 -9 file.txt    # Maximum compression
+bzip2 -1 file.txt    # Fastest compression
 
-## Tips
-- Selalu gunakan `file` untuk cek tipe
-- Backup file sebelum manipulasi
-- Perhatikan ekstensi file
-- Gunakan direktori temporer
+# Decompress
+bzip2 -d file.bz2
+bunzip2 file.bz2
 
-## Konsep yang Dipelajari
-- Hexdump dan binary data
-- Multiple file compression
-- File type detection
-- Temporary directory usage
-- Command line file manipulation
+# Test integrity
+bzip2 -t file.bz2
+```
 
-## Langkah Detail Dekompresi
-1. Cek tipe file dengan `file`
-2. Rename sesuai ekstensi yang tepat
-3. Gunakan tool dekompresi yang sesuai
-4. Ulangi sampai dapat file teks
+### 3. Tar
+```bash
+# Create archive
+tar cf archive.tar files/
+tar czf archive.tar.gz files/   # With gzip
+tar cjf archive.tar.bz2 files/  # With bzip2
 
-## Catatan Keamanan
-- Gunakan direktori temporer pribadi
-- Hapus file temporer setelah selesai
-- Jangan decompress file mencurigakan
-- Verifikasi hasil tiap langkah
+# Extract
+tar xf archive.tar
+tar xzf archive.tar.gz
+tar xjf archive.tar.bz2
+
+# List contents
+tar tf archive.tar
+```
+
+## Binary Analysis
+
+### 1. File Type Detection
+```bash
+# Basic check
+file binary_file
+
+# Detailed analysis
+file -z compressed_file
+file -i file          # MIME type
+
+# Magic numbers
+hexdump -C -n 16 file
+xxd -l 16 file
+```
+
+### 2. Hex Operations
+```bash
+# Create hexdump
+xxd file > file.hex
+
+# Reverse hexdump
+xxd -r file.hex > file
+
+# With formatting
+xxd -g 1 file        # Group bytes
+xxd -c 16 file       # Columns
+```
+
+### 3. Data Recovery
+```bash
+# Carve files
+foremost -t all -i disk_image
+
+# Extract embedded
+binwalk -e file
+
+# Recover corrupted
+dd if=file of=fixed bs=1 skip=N
+```
+
+## Advanced Compression
+
+### 1. Multiple Formats
+```bash
+# Nested compression
+tar czf outer.tar.gz inner.tar.gz
+zip -r archive.zip compressed/
+
+# Mixed formats
+tar cf - files/ | gzip > archive.tar.gz
+bzip2 -c file > file.bz2
+```
+
+### 2. Streaming
+```bash
+# Compress stream
+cat file | gzip > compressed.gz
+
+# Decompress stream
+zcat file.gz | grep pattern
+
+# Pipeline
+tar cf - . | ssh host 'cd /dest && tar xf -'
+```
+
+### 3. Split Archives
+```bash
+# Split large files
+split -b 1M file.tar parts_
+cat parts_* > file.tar
+
+# With compression
+tar czf - files/ | split -b 1M - archive.tar.gz.
+cat archive.tar.gz.* | tar xzf -
+```
+
+## File Management
+
+### 1. Organization
+```bash
+# Create workspace
+mkdir -p work/{input,output,temp}
+cd work
+
+# Clean up
+find . -name "*.tmp" -delete
+rm -rf temp/*
+```
+
+### 2. File Operations
+```bash
+# Copy with structure
+cp -r source/ dest/
+
+# Move files
+mv *.gz ../archive/
+
+# Secure delete
+shred -u sensitive_file
+```
+
+### 3. Permissions
+```bash
+# Set permissions
+chmod 700 workspace/
+chmod -R 644 files/
+
+# Change ownership
+chown -R user:group directory/
+```
+
+## Performance Optimization
+
+### 1. Compression Levels
+```bash
+# Fast compression
+gzip -1 large_file
+bzip2 -1 large_file
+
+# Best compression
+gzip -9 small_file
+bzip2 -9 small_file
+```
+
+### 2. Parallel Processing
+```bash
+# Parallel compression
+parallel gzip ::: files/*
+
+# Multiple operations
+find . -type f -exec gzip {} +
+```
+
+### 3. Resource Management
+```bash
+# Limit CPU
+nice -n 19 tar czf archive.tar.gz files/
+
+# Memory limits
+ulimit -v 1000000
+```
+
+## Best Practices
+
+### 1. Data Handling
+- Verify file integrity
+- Use appropriate tools
+- Keep original files
+- Document process
+
+### 2. Security
+- Check file permissions
+- Verify sources
+- Handle errors
+- Monitor resources
+
+### 3. Efficiency
+- Choose right format
+- Optimize settings
+- Use streaming
+- Clean up temp files
 
 ## Troubleshooting
-- File corrupt: cek hasil hexdump
-- Wrong extension: gunakan `file`
-- Permission denied: cek permissions
-- No space: gunakan `du` untuk cek space
+
+### 1. Common Issues
+- Corrupted files
+- Wrong format
+- Permission errors
+- Resource limits
+
+### 2. Solutions
+```bash
+# Check integrity
+gzip -t file.gz
+bzip2 -t file.bz2
+
+# Fix permissions
+chmod +r file
+chown user file
+
+# Resource issues
+ulimit -a
+```
+
+### 3. Debugging
+```bash
+# View process
+strace command
+
+# Check errors
+command 2>error.log
+
+# Monitor resources
+top -p $$
+```
+
+## Additional Resources
+
+### 1. Man Pages
+```bash
+man gzip
+man bzip2
+man tar
+man xxd
+```
+
+### 2. Documentation
+- Compression Algorithms
+- File Formats
+- System Tools
+- Performance Tuning
+
+### 3. Tools
+- Compression utilities
+- File analysis tools
+- System monitors
+- Recovery software

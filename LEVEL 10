@@ -1,88 +1,288 @@
 # Bandit Level 9 → Level 10
 
 ## Level Goal
-Menemukan password untuk level selanjutnya yang tersimpan dalam file `data.txt`. Password berada di antara beberapa string yang dapat dibaca manusia (human-readable) dan didahului oleh beberapa karakter '='.
+Menemukan password untuk level selanjutnya yang tersimpan dalam file `data.txt`, yang berisi beberapa karakter '=' dan merupakan salah satu string yang dapat dibaca manusia (human-readable) dalam file.
 
-## Langkah Penyelesaian
+## Detailed Command Breakdown
 
-1. Login ke server menggunakan SSH:
-   ```bash
-   ssh bandit9@bandit.labs.overthewire.org -p 2220
-   ```
-   (Gunakan password yang didapat dari level sebelumnya)
+### 1. SSH Connection
+```bash
+ssh bandit9@bandit.labs.overthewire.org -p 2220
+```
 
-2. Verifikasi keberadaan file data.txt:
-   ```bash
-   ls -l data.txt
-   ```
+### 2. Finding Human-Readable Strings
+```bash
+# Basic strings command
+strings data.txt | grep "="
 
-3. File ini berisi data binary dan teks. Gunakan kombinasi `strings` dan `grep`:
-   ```bash
-   strings data.txt | grep "==="
-   ```
-   
-   Penjelasan command:
-   - `strings`: mengekstrak string yang dapat dibaca manusia
-   - `grep "==="`: mencari baris yang mengandung beberapa karakter '='
+# With context
+strings data.txt | grep -A1 -B1 "="
 
-4. Password akan muncul setelah karakter '='
+# With line numbers
+strings data.txt | grep -n "="
+```
 
-5. Salin password dan logout:
-   ```bash
-   exit
-   ```
+## Binary File Analysis
 
-## Penjelasan Teknis
+### 1. Basic File Information
+```bash
+# Check file type
+file data.txt
 
-### Perintah Strings
-- Mencari string yang dapat dibaca dalam file binary
-- Mengabaikan karakter non-printable
-- Default minimal panjang string: 4 karakter
-- Sangat berguna untuk analisis file binary
+# View hex dump
+xxd data.txt | less
 
-### Opsi Strings yang Berguna
-- `-n N`: set minimal panjang string
-- `-f`: tampilkan nama file
-- `-t`: tampilkan offset
-- `-e`: specify encoding
+# View file stats
+stat data.txt
+```
 
-### Mengapa Menggunakan Strings?
-- File bisa berisi data binary
-- Tidak semua data bisa dibaca dengan cat
-- Strings mengekstrak bagian yang readable
-- Mencegah kerusakan terminal
+### 2. String Extraction Tools
+```bash
+# Basic strings
+strings file
 
-## Tips
-- Gunakan strings untuk file binary
-- Kombinasikan dengan grep untuk filter
-- Perhatikan pattern yang dicari
-- Reset terminal jika display rusak
+# With minimum length
+strings -n 8 file
 
-## Konsep yang Dipelajari
-- Binary file analysis
-- Text extraction dari binary
-- Pattern matching
-- Piping commands
-- File type handling
+# With encoding options
+strings -e s file  # 7-bit
+strings -e S file  # 8-bit
+strings -e l file  # 16-bit little endian
+strings -e b file  # 16-bit big endian
+```
 
-## Variasi Command yang Bisa Digunakan
-1. Dengan lebih banyak konteks:
-   ```bash
-   strings data.txt | grep -A 1 -B 1 "==="
-   ```
+### 3. Advanced String Search
+```bash
+# With context
+strings file | grep -C2 pattern
 
-2. Dengan minimal panjang string custom:
-   ```bash
-   strings -n 8 data.txt | grep "==="
-   ```
+# With byte offset
+strings -a -t x file
 
-3. Dengan offset (untuk debugging):
-   ```bash
-   strings -t x data.txt | grep "==="
-   ```
+# With section info (for ELF)
+strings -a -f file
+```
 
-## Catatan Keamanan
-- Binary files bisa berbahaya
-- Selalu verifikasi file type
-- Gunakan tools yang aman
-- Jangan eksekusi file yang tidak dikenal
+## Text Processing in Binary Files
+
+### 1. Basic Text Extraction
+```bash
+# Find printable strings
+strings -a binary_file
+
+# Find with minimum length
+strings -n 4 binary_file
+
+# Find with encoding
+strings -e {s,S,l,b} binary_file
+```
+
+### 2. Pattern Matching
+```bash
+# Using grep after strings
+strings file | grep -i "password"
+
+# Using regular expressions
+strings file | grep -E "[0-9]{4}"
+
+# Using multiple patterns
+strings file | egrep "pass|key|secret"
+```
+
+### 3. Format-Specific Tools
+```bash
+# PDF text extraction
+pdftotext file.pdf -
+
+# Office documents
+antiword doc.doc
+catdoc doc.doc
+
+# Image metadata
+exiftool image.jpg
+```
+
+## Binary Analysis Tools
+
+### 1. File Analysis
+```bash
+# Basic file info
+file binary_file
+
+# Detailed analysis
+binwalk binary_file
+
+# Entropy analysis
+binwalk -E binary_file
+```
+
+### 2. Hex Editors
+```bash
+# View hex dump
+xxd binary_file
+
+# Interactive hex editor
+hexedit binary_file
+
+# Hex dump with ASCII
+hexdump -C binary_file
+```
+
+### 3. Memory Analysis
+```bash
+# Memory dump analysis
+volatility -f memory.dmp imageinfo
+
+# Process memory
+gdb ./program
+dump memory output.bin start_addr end_addr
+```
+
+## Data Formats
+
+### 1. Common Encodings
+```bash
+# Base64
+base64 file
+base64 -d encoded_file
+
+# Hex encoding
+xxd -p file
+xxd -p -r encoded_file
+```
+
+### 2. File Signatures
+```bash
+# Check magic numbers
+file -k binary_file
+
+# View file headers
+head -c 16 binary_file | xxd
+
+# Identify file type
+TrID binary_file
+```
+
+### 3. Data Recovery
+```bash
+# Carve files
+foremost -t all -i disk_image
+
+# Recover deleted files
+photorec disk_image
+
+# Extract embedded files
+binwalk -e binary_file
+```
+
+## Security Analysis
+
+### 1. Malware Analysis
+```bash
+# Static analysis
+strings malware | grep -i "http"
+
+# Dynamic analysis
+strace ./program
+
+# Network activity
+tcpdump -r capture.pcap
+```
+
+### 2. File Integrity
+```bash
+# Calculate hashes
+md5sum file
+sha256sum file
+
+# Compare files
+cmp file1 file2
+diff -u <(xxd file1) <(xxd file2)
+```
+
+### 3. Hidden Data
+```bash
+# Find hidden strings
+strings -a -t x file
+
+# Check for steganography
+steghide info file.jpg
+
+# Extract metadata
+exiftool -a -u file
+```
+
+## Best Practices
+
+### 1. Analysis Workflow
+1. Check file type
+2. Extract strings
+3. Look for patterns
+4. Use specialized tools
+5. Document findings
+
+### 2. Security Considerations
+- Work in isolated environment
+- Keep original files intact
+- Use write blockers
+- Monitor system activity
+
+### 3. Performance Tips
+- Use appropriate tools
+- Filter output effectively
+- Handle large files properly
+- Use memory efficiently
+
+## Troubleshooting
+
+### 1. Common Issues
+- File permissions
+- Encoding problems
+- Resource limitations
+- Tool compatibility
+
+### 2. Solutions
+```bash
+# Permission issues
+chmod +r file
+
+# Encoding problems
+iconv -f encoding -t utf-8 file
+
+# Memory issues
+ulimit -v unlimited
+```
+
+### 3. Debugging
+```bash
+# Debug output
+strings -d file
+
+# Verbose mode
+strings -v file
+
+# Error checking
+strings file 2>errors.log
+```
+
+## Additional Resources
+
+### 1. Man Pages
+```bash
+man strings
+man xxd
+man file
+man binwalk
+```
+
+### 2. Documentation
+- Binary Analysis Guide
+- File Format Specs
+- Encoding Standards
+- Security Best Practices
+
+### 3. Tools
+- Binary analysis tools
+- Hex editors
+- Forensics suites
+- Security scanners

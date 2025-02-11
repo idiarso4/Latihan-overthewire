@@ -1,124 +1,351 @@
 # Bandit Level 14 → Level 15
 
 ## Level Goal
-Mendapatkan password untuk level selanjutnya dengan cara mengirimkan password level saat ini ke port 30000 pada localhost.
+Menemukan password untuk level selanjutnya dengan mengirimkan password level ini ke port 30000 pada localhost.
 
-## Langkah Penyelesaian
+## Detailed Command Breakdown
 
-1. Login ke server menggunakan SSH:
-   ```bash
-   ssh bandit14@bandit.labs.overthewire.org -p 2220
-   ```
-   (Gunakan password yang didapat dari level sebelumnya)
+### 1. SSH Connection
+```bash
+ssh bandit14@bandit.labs.overthewire.org -p 2220
+```
 
-2. Baca password level saat ini:
-   ```bash
-   cat /etc/bandit_pass/bandit14
-   ```
+### 2. Network Service Connection
+```bash
+# Using netcat
+nc localhost 30000
 
-3. Kirim password ke localhost port 30000. Ada beberapa cara:
+# Using telnet
+telnet localhost 30000
 
-   Menggunakan nc (netcat):
-   ```bash
-   echo "[password_level_14]" | nc localhost 30000
-   ```
+# Using /dev/tcp
+echo "password" > /dev/tcp/localhost/30000
+```
 
-   Atau menggunakan telnet:
-   ```bash
-   telnet localhost 30000
-   ```
-   Kemudian paste password dan tekan Enter
+## Network Tools
 
-4. Password untuk level selanjutnya akan ditampilkan sebagai response
+### 1. Netcat (nc)
+```bash
+# Basic connection
+nc host port
+nc -v host port
 
-5. Salin password dan logout:
-   ```bash
-   exit
-   ```
+# Listen mode
+nc -l -p port
+nc -lvp port
 
-## Penjelasan Teknis
+# File transfer
+nc -l -p port > file    # receiver
+nc host port < file     # sender
 
-### Localhost
-- Merujuk ke komputer lokal
-- IP address: 127.0.0.1
-- Hostname: localhost
-- Digunakan untuk testing network services
+# Port scanning
+nc -zv host port-range
+nc -zv 192.168.1.1 20-30
+```
 
-### Port
-- Endpoint komunikasi di network
-- Range: 0-65535
-- Well-known ports: 0-1023
-- Registered ports: 1024-49151
-- Dynamic ports: 49152-65535
+### 2. Telnet
+```bash
+# Basic connection
+telnet host port
 
-### Network Tools
+# With options
+telnet -l user host
+telnet -b src_addr host
 
-1. Netcat (nc)
-- Swiss army knife untuk TCP/IP
-- Bisa sebagai client atau server
-- Mendukung TCP dan UDP
-- Sangat berguna untuk debugging
+# Debug mode
+telnet -d host port
+```
 
-2. Telnet
-- Protocol untuk remote access
-- Plain text (tidak aman)
-- Berguna untuk testing TCP ports
-- Tidak direkomendasikan untuk remote access
+### 3. Socat
+```bash
+# TCP connection
+socat - TCP:host:port
 
-## Tips
-- Selalu catat port number
-- Gunakan nc untuk quick testing
-- Perhatikan format input/output
-- Simpan password dengan aman
+# Listen mode
+socat TCP-LISTEN:port -
 
-## Konsep yang Dipelajari
-- Network basics
-- Port dan services
-- Client-server communication
-- Network debugging tools
+# With SSL
+socat openssl-connect:host:port -
+socat openssl-listen:port -
 
-## Variasi Command
+# File transfer
+socat TCP-LISTEN:port,fork file:data
+socat TCP:host:port file:data
+```
 
-1. Menggunakan nc dengan timeout:
-   ```bash
-   echo "[password]" | nc -w 5 localhost 30000
-   ```
+## Network Analysis
 
-2. Menggunakan nc verbose mode:
-   ```bash
-   echo "[password]" | nc -v localhost 30000
-   ```
+### 1. Port Scanning
+```bash
+# Using nmap
+nmap -p port host
+nmap -p- host
+nmap -sV host
 
-3. Menggunakan telnet dengan timeout:
-   ```bash
-   (echo "[password]"; sleep 1) | telnet localhost 30000
-   ```
+# Using netcat
+nc -zv host 1-1000
+nc -w1 host port
+
+# Using telnet
+for p in {1..1000}; do
+  telnet host $p
+done
+```
+
+### 2. Traffic Analysis
+```bash
+# Using tcpdump
+tcpdump port 80
+tcpdump host target
+tcpdump -i eth0
+
+# Using wireshark cli
+tshark -i eth0
+tshark -f "port 80"
+tshark -Y "http"
+```
+
+### 3. Connection Testing
+```bash
+# Using curl
+curl -v host:port
+curl -I host:port
+curl --trace - host
+
+# Using wget
+wget -d host:port
+wget --debug host
+```
+
+## Service Discovery
+
+### 1. DNS Tools
+```bash
+# Basic lookup
+dig domain
+nslookup domain
+
+# Reverse lookup
+dig -x ip_address
+nslookup ip_address
+
+# Service records
+dig _service._proto.domain SRV
+```
+
+### 2. Service Scanning
+```bash
+# Version detection
+nmap -sV host
+
+# Script scanning
+nmap -sC host
+
+# UDP services
+nmap -sU host
+```
+
+### 3. Banner Grabbing
+```bash
+# Using netcat
+echo "" | nc -v host port
+
+# Using telnet
+telnet host port
+
+# Using curl
+curl -v telnet://host:port
+```
+
+## Connection Management
+
+### 1. Keep-Alive
+```bash
+# Using netcat
+nc -k -l port
+
+# Using socat
+socat TCP-LISTEN:port,fork,reuseaddr -
+
+# Using telnet
+while true; do
+  telnet host port
+  sleep 1
+done
+```
+
+### 2. Timeouts
+```bash
+# Netcat timeout
+nc -w timeout host port
+
+# Curl timeout
+curl --connect-timeout 10 host
+
+# Wget timeout
+wget --timeout=10 host
+```
+
+### 3. Multiple Connections
+```bash
+# Parallel nc
+for i in {1..10}; do
+  nc host port &
+done
+
+# With xargs
+seq 10 | xargs -P10 -I{} nc host port
+```
+
+## Protocol Handling
+
+### 1. HTTP
+```bash
+# GET request
+printf "GET / HTTP/1.0\r\n\r\n" | nc host 80
+
+# POST request
+printf "POST /path HTTP/1.0\r\nContent-Length: 5\r\n\r\ndata" | nc host 80
+
+# Headers only
+printf "HEAD / HTTP/1.0\r\n\r\n" | nc host 80
+```
+
+### 2. SMTP
+```bash
+# Mail test
+nc mail.server 25 << EOF
+HELO domain
+MAIL FROM: <sender@domain>
+RCPT TO: <recipient@domain>
+DATA
+Subject: Test
+Test email
+.
+QUIT
+EOF
+```
+
+### 3. Custom Protocols
+```bash
+# Raw data
+echo -n "custom_data" | nc host port
+
+# Hex data
+echo "0x41424344" | xxd -r -p | nc host port
+
+# With timing
+(echo "data1"; sleep 1; echo "data2") | nc host port
+```
+
+## Security Considerations
+
+### 1. Encryption
+```bash
+# SSL/TLS connection
+openssl s_client -connect host:port
+
+# With specific protocol
+openssl s_client -tls1_2 -connect host:port
+
+# Certificate verification
+openssl s_client -verify 2 -connect host:port
+```
+
+### 2. Authentication
+```bash
+# Basic auth
+echo -n "user:pass" | base64
+curl -u user:pass host
+
+# Token auth
+curl -H "Authorization: Bearer token" host
+```
+
+### 3. Firewalls
+```bash
+# Check if blocked
+nc -zv host port
+
+# Alternative ports
+nc -zv host 80,443,8080
+
+# Through proxy
+nc -X connect -x proxy:port host target_port
+```
 
 ## Troubleshooting
 
-1. Connection refused:
-   - Periksa port number
-   - Pastikan service running
-   - Cek firewall settings
+### 1. Common Issues
+- Connection refused
+- Connection timeout
+- Wrong protocol
+- Firewall blocking
 
-2. No response:
-   - Periksa format input
-   - Cek network connectivity
-   - Tambahkan newline di input
+### 2. Solutions
+```bash
+# Debug mode
+nc -v host port
+telnet -d host port
 
-3. Wrong output:
-   - Verifikasi password
-   - Periksa format pengiriman
-   - Cek special characters
+# Check service
+netstat -tuln | grep port
+ss -tuln | grep port
 
-## Network Security Notes
-- Port scanning bisa illegal
-- Selalu dapat izin sebelum testing
-- Gunakan tools dengan bertanggung jawab
-- Monitor network activity
+# Test connectivity
+ping host
+traceroute host
+```
 
-## Penggunaan di Dunia Nyata
-- Network service testing
-- Port scanning
-- Service debugging
-- Protocol analysis
+### 3. Logging
+```bash
+# Network traffic
+tcpdump -i any port port
+wireshark -i any -f "port port"
+
+# System logs
+tail -f /var/log/syslog
+journalctl -f
+```
+
+## Best Practices
+
+### 1. Connection Handling
+- Use timeouts
+- Handle errors
+- Clean up connections
+- Log activity
+
+### 2. Security
+- Encrypt sensitive data
+- Validate input
+- Use authentication
+- Monitor access
+
+### 3. Performance
+- Connection pooling
+- Load balancing
+- Caching
+- Monitoring
+
+## Additional Resources
+
+### 1. Man Pages
+```bash
+man nc
+man telnet
+man socat
+man tcpdump
+```
+
+### 2. Documentation
+- Network Protocols
+- Security Standards
+- Performance Tuning
+- Debugging Tools
+
+### 3. Tools
+- Network analyzers
+- Protocol testers
+- Monitoring tools
+- Security scanners

@@ -1,0 +1,271 @@
+# Bandit Level 15 → Level 16
+
+## Level Goal
+Menemukan password untuk level selanjutnya dengan mengirimkan password level ini ke port 30001 pada localhost menggunakan koneksi SSL/TLS.
+
+## Detailed Command Breakdown
+
+### 1. SSH Connection
+```bash
+ssh bandit15@bandit.labs.overthewire.org -p 2220
+```
+
+### 2. SSL/TLS Connection
+```bash
+# Using openssl
+openssl s_client -connect localhost:30001
+
+# Using socat
+socat - OPENSSL:localhost:30001
+
+# Using ncat
+ncat --ssl localhost 30001
+```
+
+## SSL/TLS Tools
+
+### 1. OpenSSL
+```bash
+# Basic connection
+openssl s_client -connect host:port
+
+# With specific protocol
+openssl s_client -tls1_2 -connect host:port
+openssl s_client -tls1_3 -connect host:port
+
+# Debug output
+openssl s_client -debug -connect host:port
+openssl s_client -msg -connect host:port
+```
+
+### 2. Certificate Management
+```bash
+# Generate private key
+openssl genpkey -algorithm RSA -out private.key
+openssl genpkey -algorithm EC -out ec.key
+
+# Create CSR
+openssl req -new -key private.key -out cert.csr
+openssl req -newkey rsa:2048 -nodes -keyout key.pem -out cert.csr
+
+# Self-signed certificate
+openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365
+```
+
+### 3. Certificate Operations
+```bash
+# View certificate
+openssl x509 -in cert.pem -text
+openssl x509 -in cert.pem -noout -fingerprint
+
+# Convert formats
+openssl x509 -in cert.pem -out cert.der -outform DER
+openssl x509 -in cert.der -inform DER -out cert.pem -outform PEM
+```
+
+## SSL/TLS Configuration
+
+### 1. Client Config
+```bash
+# Cipher selection
+openssl s_client -cipher 'HIGH' -connect host:port
+openssl s_client -ciphersuites TLS_AES_256_GCM_SHA384 -connect host:port
+
+# Certificate verification
+openssl s_client -verify 2 -CAfile ca.pem -connect host:port
+openssl s_client -verify_return_error -connect host:port
+```
+
+### 2. Server Config
+```bash
+# Start SSL server
+openssl s_server -cert cert.pem -key key.pem -port 443
+openssl s_server -cert cert.pem -key key.pem -www -port 443
+
+# With specific protocol
+openssl s_server -tls1_2 -cert cert.pem -key key.pem -port 443
+```
+
+### 3. Protocol Settings
+```bash
+# Protocol selection
+openssl s_client -tls1_2 -connect host:port
+openssl s_client -tls1_3 -connect host:port
+
+# Protocol restrictions
+openssl s_client -no_ssl3 -connect host:port
+openssl s_client -no_tls1 -connect host:port
+```
+
+## Certificate Validation
+
+### 1. Chain Verification
+```bash
+# Verify chain
+openssl verify -CAfile ca.pem cert.pem
+openssl verify -CApath /etc/ssl/certs cert.pem
+
+# Show chain
+openssl s_client -showcerts -connect host:port
+openssl s_client -verify 5 -CAfile ca.pem -connect host:port
+```
+
+### 2. Certificate Testing
+```bash
+# Test expiration
+openssl x509 -enddate -noout -in cert.pem
+openssl x509 -checkend 86400 -in cert.pem
+
+# Test revocation
+openssl ocsp -issuer issuer.pem -cert cert.pem -url http://ocsp.server
+```
+
+### 3. Key Verification
+```bash
+# Check private key
+openssl rsa -check -in private.key
+openssl ec -check -in ec.key
+
+# Match certificate
+openssl x509 -noout -modulus -in cert.pem | openssl md5
+openssl rsa -noout -modulus -in key.pem | openssl md5
+```
+
+## Security Features
+
+### 1. Key Generation
+```bash
+# Generate strong key
+openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:4096
+openssl genpkey -algorithm EC -pkeyopt ec_paramgen_curve:P-384
+
+# With encryption
+openssl genpkey -aes-256-cbc -algorithm RSA -out encrypted.key
+```
+
+### 2. Cipher Control
+```bash
+# List ciphers
+openssl ciphers -v
+openssl ciphers -v 'HIGH'
+
+# Test cipher
+openssl s_client -cipher 'AES256-SHA' -connect host:port
+```
+
+### 3. Perfect Forward Secrecy
+```bash
+# Enable DHE
+openssl s_client -cipher 'EDH' -connect host:port
+
+# Enable ECDHE
+openssl s_client -cipher 'EECDH' -connect host:port
+```
+
+## Performance Optimization
+
+### 1. Session Management
+```bash
+# Session reuse
+openssl s_client -reconnect -connect host:port
+
+# Session tickets
+openssl s_client -sess_out session.pem -connect host:port
+openssl s_client -sess_in session.pem -connect host:port
+```
+
+### 2. Hardware Acceleration
+```bash
+# List engines
+openssl engine -t
+
+# Use engine
+openssl s_client -engine id -connect host:port
+```
+
+### 3. Connection Pooling
+```bash
+# Keep alive
+openssl s_client -connect host:port -quiet -sess_out session.pem
+
+# Reuse connection
+while true; do
+    openssl s_client -connect host:port -sess_in session.pem
+    sleep 1
+done
+```
+
+## Troubleshooting
+
+### 1. Common Issues
+- Certificate errors
+- Protocol mismatch
+- Cipher incompatibility
+- Chain validation
+
+### 2. Solutions
+```bash
+# Debug connection
+openssl s_client -debug -connect host:port
+openssl s_client -msg -connect host:port
+
+# Verify certificate
+openssl verify -verbose -CAfile ca.pem cert.pem
+
+# Check protocols
+openssl s_client -tls1_2 -connect host:port
+```
+
+### 3. Logging
+```bash
+# Connection info
+openssl s_client -state -connect host:port
+
+# Certificate chain
+openssl s_client -showcerts -connect host:port
+
+# Key usage
+openssl x509 -in cert.pem -text -noout
+```
+
+## Best Practices
+
+### 1. Security
+- Use strong protocols
+- Enable PFS
+- Validate certificates
+- Monitor expiry
+
+### 2. Performance
+- Session reuse
+- Connection pooling
+- Hardware acceleration
+- Cipher selection
+
+### 3. Maintenance
+- Regular updates
+- Certificate rotation
+- Key backup
+- Audit logging
+
+## Additional Resources
+
+### 1. Man Pages
+```bash
+man openssl
+man s_client
+man x509
+man verify
+```
+
+### 2. Documentation
+- OpenSSL Guide
+- TLS Standards
+- Security Best Practices
+- Performance Tuning
+
+### 3. Tools
+- Certificate managers
+- Key generators
+- Testing utilities
+- Monitoring tools

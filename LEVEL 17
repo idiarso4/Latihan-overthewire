@@ -1,0 +1,372 @@
+# Bandit Level 16 → Level 17
+
+## Level Goal
+Menemukan password untuk level selanjutnya dengan melakukan port scanning pada localhost untuk menemukan port yang menyediakan layanan SSL/TLS antara port 31000 dan 32000. Kemudian kirimkan password level ini ke port tersebut.
+
+## Detailed Command Breakdown
+
+### 1. SSH Connection
+```bash
+ssh bandit16@bandit.labs.overthewire.org -p 2220
+```
+
+### 2. Port Scanning
+```bash
+# Using nmap
+nmap -p 31000-32000 localhost
+nmap -sV -p 31000-32000 localhost
+
+# Using netcat
+nc -zv localhost 31000-32000
+
+# Using bash loop
+for port in {31000..32000}; do
+    nc -zv localhost $port 2>&1
+done
+```
+
+## Port Scanning Tools
+
+### 1. Nmap
+```bash
+# Basic scan
+nmap host
+nmap -p 80,443 host
+nmap -p- host
+
+# Service detection
+nmap -sV host
+nmap -A host
+nmap -sC host
+
+# Output formats
+nmap -oN output.txt host
+nmap -oX output.xml host
+nmap -oG output.grep host
+```
+
+### 2. Netcat
+```bash
+# Port range scan
+nc -zv host 1-1000
+nc -zv -w1 host 1-1000
+
+# UDP scan
+nc -zuv host 53
+nc -zvu host 1-1000
+
+# With timeout
+nc -zvw 3 host 1-1000
+```
+
+### 3. Custom Scripts
+```bash
+# Bash port scanner
+for port in {1..1000}; do
+    (echo > /dev/tcp/host/$port) &>/dev/null && 
+        echo "Port $port is open"
+done
+
+# Python scanner
+python -c 'import socket; print([port for port in range(1,1001) if not socket.socket().connect_ex(("host",port))])'
+```
+
+## Service Detection
+
+### 1. Version Detection
+```bash
+# Nmap version scan
+nmap -sV host
+nmap -sV --version-intensity 5 host
+nmap -sV --version-all host
+
+# Banner grabbing
+nc -v host port
+echo "" | nc -v host port
+```
+
+### 2. Service Fingerprinting
+```bash
+# OS detection
+nmap -O host
+nmap -A host
+
+# Script scanning
+nmap -sC host
+nmap --script=banner host
+nmap --script=ssl-enum-ciphers host
+```
+
+### 3. Protocol Analysis
+```bash
+# HTTP detection
+curl -I host:port
+wget -q -O - host:port
+
+# SSL detection
+openssl s_client -connect host:port
+```
+
+## Network Mapping
+
+### 1. Host Discovery
+```bash
+# Ping scan
+nmap -sn network/24
+nmap -PR network/24
+
+# ARP scan
+nmap -PR network/24
+arp-scan --localnet
+```
+
+### 2. Network Topology
+```bash
+# Traceroute
+nmap --traceroute host
+traceroute host
+
+# Path MTU
+tracepath host
+mtr host
+```
+
+### 3. Network Services
+```bash
+# Service map
+nmap -sV network/24
+nmap -p- -sV network/24
+
+# Common services
+nmap -p 21,22,23,25,80,443 network/24
+```
+
+## Advanced Scanning
+
+### 1. Timing Templates
+```bash
+# Paranoid
+nmap -T0 host
+
+# Sneaky
+nmap -T1 host
+
+# Polite
+nmap -T2 host
+
+# Normal
+nmap -T3 host
+
+# Aggressive
+nmap -T4 host
+
+# Insane
+nmap -T5 host
+```
+
+### 2. Scan Techniques
+```bash
+# TCP SYN scan
+nmap -sS host
+
+# TCP connect scan
+nmap -sT host
+
+# UDP scan
+nmap -sU host
+
+# FIN scan
+nmap -sF host
+```
+
+### 3. Custom Timing
+```bash
+# Scan delay
+nmap --scan-delay 1s host
+
+# Max RTT timeout
+nmap --max-rtt-timeout 100ms host
+
+# Min rate
+nmap --min-rate 100 host
+```
+
+## Service Enumeration
+
+### 1. HTTP Services
+```bash
+# Directory scan
+gobuster dir -u http://host -w wordlist.txt
+dirb http://host
+
+# Virtual hosts
+gobuster vhost -u http://host -w wordlist.txt
+
+# Web scanning
+nikto -h host
+```
+
+### 2. SSL Services
+```bash
+# Cipher scan
+sslscan host:port
+nmap --script ssl-enum-ciphers -p port host
+
+# Certificate info
+openssl s_client -connect host:port
+```
+
+### 3. Database Services
+```bash
+# MySQL
+nmap -p 3306 --script mysql-info host
+
+# PostgreSQL
+nmap -p 5432 --script pgsql-brute host
+
+# MongoDB
+nmap -p 27017 --script mongodb-info host
+```
+
+## Performance Optimization
+
+### 1. Scan Speed
+```bash
+# Fast scan
+nmap -F host
+
+# Version detection speed
+nmap -sV --version-intensity 0 host
+
+# Parallel scanning
+nmap --min-hostgroup 100 host
+```
+
+### 2. Resource Usage
+```bash
+# Limit bandwidth
+nmap --max-rate 100 host
+
+# Aggressive timing
+nmap -T4 -n host
+
+# Host timeout
+nmap --host-timeout 30s host
+```
+
+### 3. Output Control
+```bash
+# Minimal output
+nmap -sS -n -Pn --min-rate 5000 host
+
+# Status updates
+nmap -v host
+nmap -vv host
+```
+
+## Security Considerations
+
+### 1. Stealth Scanning
+```bash
+# Decoy scanning
+nmap -D decoy1,decoy2,ME host
+
+# Fragmented packets
+nmap -f host
+
+# Timing control
+nmap -T0 host
+```
+
+### 2. IDS Evasion
+```bash
+# Random data
+nmap --data-length 24 host
+
+# Source port
+nmap --source-port 53 host
+
+# MAC spoofing
+nmap --spoof-mac MAC host
+```
+
+### 3. Access Control
+```bash
+# Limit scope
+nmap --exclude host1,host2 network
+nmap --excludefile exclude.txt network
+
+# Target selection
+nmap -iL targets.txt
+```
+
+## Troubleshooting
+
+### 1. Common Issues
+- Blocked ports
+- Filtered responses
+- False positives
+- Timeouts
+
+### 2. Solutions
+```bash
+# Verify connectivity
+ping host
+traceroute host
+
+# Debug scan
+nmap -v -p port host
+nmap -d -p port host
+```
+
+### 3. Logging
+```bash
+# Debug output
+nmap -d host
+nmap -dd host
+
+# Packet trace
+nmap --packet-trace host
+```
+
+## Best Practices
+
+### 1. Scanning
+- Start with basic scans
+- Increase intensity gradually
+- Respect target limits
+- Document findings
+
+### 2. Security
+- Get permission first
+- Avoid disruption
+- Monitor impact
+- Follow policies
+
+### 3. Performance
+- Optimize timing
+- Control bandwidth
+- Manage resources
+- Clean output
+
+## Additional Resources
+
+### 1. Man Pages
+```bash
+man nmap
+man nc
+man tcpdump
+man wireshark
+```
+
+### 2. Documentation
+- Nmap Reference Guide
+- Port Scanning Techniques
+- Service Detection
+- Security Guidelines
+
+### 3. Tools
+- Network scanners
+- Service detectors
+- Protocol analyzers
+- Security tools

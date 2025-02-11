@@ -1,99 +1,249 @@
 # Bandit Level 11 → Level 12
 
 ## Level Goal
-Menemukan password untuk level selanjutnya yang tersimpan dalam file `data.txt`. Semua huruf (baik lowercase a-z maupun uppercase A-Z) telah dirotasi sebanyak 13 posisi (ROT13).
+Menemukan password untuk level selanjutnya yang tersimpan dalam file `data.txt`, dimana semua huruf kecil (a-z) dan huruf besar (A-Z) telah dirotasi 13 posisi (ROT13).
 
-## Langkah Penyelesaian
+## Detailed Command Breakdown
 
-1. Login ke server menggunakan SSH:
-   ```bash
-   ssh bandit11@bandit.labs.overthewire.org -p 2220
-   ```
-   (Gunakan password yang didapat dari level sebelumnya)
+### 1. SSH Connection
+```bash
+ssh bandit11@bandit.labs.overthewire.org -p 2220
+```
 
-2. Verifikasi keberadaan dan lihat isi file data.txt:
-   ```bash
-   ls -l data.txt
-   cat data.txt
-   ```
-   Anda akan melihat teks yang telah di-encode dengan ROT13
+### 2. ROT13 Decoding
+```bash
+# Using tr command
+cat data.txt | tr 'A-Za-z' 'N-ZA-Mn-za-m'
 
-3. Decode ROT13 menggunakan perintah tr:
-   ```bash
-   cat data.txt | tr 'A-Za-z' 'N-ZA-Mn-za-m'
-   ```
-   
-   Penjelasan command:
-   - `tr`: utility untuk translasi karakter
-   - `'A-Za-z'`: range input (semua huruf)
-   - `'N-ZA-Mn-za-m'`: range output (dirotasi 13 posisi)
+# Using multiple ranges
+cat data.txt | tr 'A-MN-Za-mn-z' 'N-ZA-Mn-za-m'
 
-4. Password akan muncul dalam bentuk plain text
+# Save to file
+cat data.txt | tr 'A-Za-z' 'N-ZA-Mn-za-m' > decoded.txt
+```
 
-5. Salin password dan logout:
-   ```bash
-   exit
-   ```
+## Text Transformation
 
-## Penjelasan Teknis
+### 1. Basic ROT13
+```bash
+# Single character
+echo "A" | tr 'A' 'N'
 
-### ROT13 Cipher
-- Substitusi sederhana yang menggeser huruf 13 posisi
-- Simetris: aplikasi ROT13 dua kali mengembalikan teks asli
-- Contoh:
-  - A → N
-  - B → O
-  - M → Z
-  - N → A
-  - Z → M
+# Full alphabet
+echo "HELLO" | tr 'A-Z' 'N-ZA-M'
 
-### Perintah TR
-- Utility untuk translasi karakter
-- Format: `tr [options] set1 set2`
-- Mengganti karakter dari set1 dengan set2
-- Case sensitive
+# Case sensitive
+echo "Hello" | tr 'A-Za-z' 'N-ZA-Mn-za-m'
+```
 
-### Cara Kerja ROT13
-1. A-M dipetakan ke N-Z
-2. N-Z dipetakan ke A-M
-3. Sama untuk lowercase
-4. Karakter non-alfabet tidak berubah
+### 2. Character Classes
+```bash
+# Upper case only
+tr 'A-Z' 'N-ZA-M'
 
-## Tips
-- ROT13 adalah cipher yang sangat sederhana
-- Bisa di-decode dengan cara yang sama dengan encode
-- Perhatikan case sensitivity
-- Gunakan tr untuk manipulasi karakter
+# Lower case only
+tr 'a-z' 'n-za-m'
 
-## Konsep yang Dipelajari
-- Simple substitution ciphers
-- Character translation di Unix
-- Text processing dengan tr
-- Case sensitivity dalam encoding
+# Numbers
+tr '0-9' '5-90-4'
+```
 
-## Variasi Command yang Bisa Digunakan
-1. Menggunakan perl:
-   ```bash
-   perl -pe 'y/A-Za-z/N-ZA-Mn-za-m/' data.txt
-   ```
+### 3. Custom Mappings
+```bash
+# Single characters
+tr 'abc' 'xyz'
 
-2. Menggunakan sed:
-   ```bash
-   sed 'y/abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ/nopqrstuvwxyzabcdefghijklmNOPQRSTUVWXYZABCDEFGHIJKLM/' data.txt
-   ```
+# Character sets
+tr '[:upper:]' '[:lower:]'
 
-3. Decode dan simpan ke file:
-   ```bash
-   cat data.txt | tr 'A-Za-z' 'N-ZA-Mn-za-m' > decoded.txt
-   ```
+# Multiple transformations
+tr 'aeiou' '12345'
+```
 
-## Catatan Keamanan
-- ROT13 BUKAN enkripsi yang aman
-- Hanya untuk obfuscation sederhana
-- Sangat mudah dipecahkan
-- Jangan gunakan untuk data sensitif
+## Advanced Text Processing
 
-## Fun Fact
-- ROT13 sering digunakan di forum untuk menyembunyikan spoiler
-- Aplikasi dua kali ROT13 mengembalikan teks asli
-- Merupakan kasus khusus dari Caesar cipher
+### 1. Multiple Operations
+```bash
+# Chain transformations
+cat file | tr 'A-Z' 'N-ZA-M' | tr 'a-z' 'n-za-m'
+
+# With other tools
+cat file | tr 'A-Z' 'N-ZA-M' | grep pattern
+
+# Complex patterns
+sed 's/pattern/replacement/' | tr 'A-Z' 'N-ZA-M'
+```
+
+### 2. Character Manipulation
+```bash
+# Delete characters
+tr -d '[:digit:]'
+
+# Squeeze repeats
+tr -s '[:space:]'
+
+# Complement
+tr -c 'a-zA-Z' ' '
+```
+
+### 3. Set Operations
+```bash
+# Character class conversion
+tr '[:upper:]' '[:lower:]'
+
+# Multiple classes
+tr '[:alnum:]' '[:alpha:]'
+
+# Custom sets
+tr -cd '[:print:]\\n'
+```
+
+## Encryption Techniques
+
+### 1. Simple Substitution
+```bash
+# Caesar cipher
+tr 'A-Z' 'D-ZA-C'
+
+# Atbash cipher
+tr 'A-Za-z' 'Z-Az-a'
+
+# Custom substitution
+tr 'A-Z' 'QWERTYUIOPASDFGHJKLZXCVBNM'
+```
+
+### 2. Multiple Rounds
+```bash
+# Double ROT13
+tr 'A-Za-z' 'N-ZA-Mn-za-m' | tr 'A-Za-z' 'N-ZA-Mn-za-m'
+
+# Mixed substitution
+tr 'A-Z' 'N-ZA-M' | tr 'a-z' '4-90-3'
+
+# Layered encryption
+openssl enc | tr 'A-Z' 'N-ZA-M'
+```
+
+### 3. Pattern Based
+```bash
+# Word substitution
+sed 's/word/encoded/'
+
+# Regular expression
+sed -E 's/[A-Z]/rot13(&)/'
+
+# Context aware
+awk '{gsub(/pattern/,"replacement")}'
+```
+
+## Data Processing
+
+### 1. File Operations
+```bash
+# Process whole file
+tr 'A-Za-z' 'N-ZA-Mn-za-m' < input > output
+
+# Stream processing
+tail -f log | tr 'A-Za-z' 'N-ZA-Mn-za-m'
+
+# Multiple files
+cat file* | tr 'A-Za-z' 'N-ZA-Mn-za-m'
+```
+
+### 2. Text Transformation
+```bash
+# Case conversion
+tr '[:lower:]' '[:upper:]'
+
+# Character deletion
+tr -d '[:punct:]'
+
+# Space normalization
+tr -s '[:space:]' ' '
+```
+
+### 3. Data Cleaning
+```bash
+# Remove non-printable
+tr -cd '[:print:]\\n'
+
+# Convert line endings
+tr -d '\\r'
+
+# Clean whitespace
+tr -s '[:space:]' ' '
+```
+
+## Best Practices
+
+### 1. Input Handling
+- Validate input format
+- Handle special characters
+- Consider character sets
+- Check file encoding
+
+### 2. Performance
+- Use appropriate tools
+- Handle large files
+- Stream when possible
+- Monitor resource usage
+
+### 3. Security
+- Validate transformations
+- Handle errors
+- Protect sensitive data
+- Document changes
+
+## Troubleshooting
+
+### 1. Common Issues
+- Character set mismatches
+- Encoding problems
+- Special characters
+- Performance issues
+
+### 2. Solutions
+```bash
+# Check character sets
+locale charmap
+
+# Handle encoding
+iconv -f utf-8 -t ascii
+
+# Debug output
+tr -d '[:print:]\\n' | xxd
+```
+
+### 3. Debugging
+```bash
+# View transformation
+echo "test" | tr 'a-z' 'A-Z' -v
+
+# Check results
+diff <(cat file) <(cat file | tr 'a-z' 'A-Z')
+
+# Monitor process
+strace tr 'a-z' 'A-Z' < file
+```
+
+## Additional Resources
+
+### 1. Man Pages
+```bash
+man tr
+man sed
+man awk
+man locale
+```
+
+### 2. Documentation
+- Text Processing Guide
+- Character Encoding
+- Unix Tools
+- Security Standards
+
+### 3. Tools
+- tr
+- sed
+- awk
+- perl
