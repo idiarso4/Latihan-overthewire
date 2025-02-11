@@ -1,0 +1,282 @@
+# Bandit Level 17 → Level 18
+
+## Level Goal
+Menemukan password untuk level selanjutnya dengan membandingkan dua file: passwords.old dan passwords.new yang ada di home directory. Password berada pada baris yang berubah di passwords.new.
+
+## Detailed Command Breakdown
+
+### 1. SSH Connection
+```bash
+ssh bandit17@bandit.labs.overthewire.org -p 2220
+```
+
+### 2. File Comparison
+```bash
+# Using diff
+diff passwords.old passwords.new
+
+# Using vimdiff
+vimdiff passwords.old passwords.new
+
+# Using comm
+comm -3 <(sort passwords.old) <(sort passwords.new)
+```
+
+## File Comparison Tools
+
+### 1. Diff
+```bash
+# Basic comparison
+diff file1 file2
+
+# Side by side
+diff -y file1 file2
+
+# Unified format
+diff -u file1 file2
+
+# Recursive comparison
+diff -r dir1 dir2
+```
+
+### 2. Vimdiff
+```bash
+# Open files
+vimdiff file1 file2
+
+# Navigation
+]c          # next difference
+[c          # previous difference
+do          # get changes from other window
+dp          # put changes to other window
+```
+
+### 3. Comm
+```bash
+# Compare sorted files
+comm file1 file2
+
+# Show only differences
+comm -3 file1 file2
+
+# Show unique lines
+comm -23 file1 file2  # unique to file1
+comm -13 file1 file2  # unique to file2
+```
+
+## Text Processing
+
+### 1. Sort
+```bash
+# Basic sort
+sort file
+
+# Numeric sort
+sort -n file
+
+# Reverse sort
+sort -r file
+
+# Remove duplicates
+sort -u file
+```
+
+### 2. Uniq
+```bash
+# Show unique lines
+uniq file
+
+# Count occurrences
+uniq -c file
+
+# Show duplicates
+uniq -d file
+
+# Show unique only
+uniq -u file
+```
+
+### 3. Cut and Paste
+```bash
+# Extract columns
+cut -d: -f1 file
+cut -c1-10 file
+
+# Combine files
+paste file1 file2
+paste -d: file1 file2
+```
+
+## Advanced Comparison
+
+### 1. Binary Comparison
+```bash
+# Using cmp
+cmp file1 file2
+cmp -l file1 file2
+
+# Using hexdump
+diff <(hexdump file1) <(hexdump file2)
+```
+
+### 2. Directory Comparison
+```bash
+# Using diff
+diff -r dir1 dir2
+diff -rq dir1 dir2
+
+# Using rsync
+rsync -avn dir1/ dir2/
+```
+
+### 3. Content Analysis
+```bash
+# Word differences
+wdiff file1 file2
+
+# Character differences
+diff --color -u file1 file2
+
+# Context differences
+diff -c file1 file2
+```
+
+## File Monitoring
+
+### 1. Change Detection
+```bash
+# Using watch
+watch -d cat file
+
+# Using inotify
+inotifywait -m file
+
+# Using tail
+tail -f file
+```
+
+### 2. Version Control
+```bash
+# Git diff
+git diff file
+git diff --word-diff file
+
+# Git log
+git log -p file
+git blame file
+```
+
+### 3. Backup Management
+```bash
+# Create backup
+cp file{,.bak}
+cp -a dir{,.bak}
+
+# Compare backups
+diff file{,.bak}
+rsync -av --dry-run dir/ dir.bak/
+```
+
+## Performance Optimization
+
+### 1. Large Files
+```bash
+# Split files
+split -l 1000 large_file prefix_
+split -b 1M large_file prefix_
+
+# Compare chunks
+diff <(head -n 1000 file1) <(head -n 1000 file2)
+```
+
+### 2. Memory Usage
+```bash
+# Stream comparison
+cmp -l file1 file2
+
+# Line by line
+while read -r line; do
+    grep -Fxq "$line" file2
+done < file1
+```
+
+### 3. Parallel Processing
+```bash
+# Using parallel
+parallel "diff {} {}.bak" ::: *
+
+# Using xargs
+find . -type f | xargs -P4 -I{} diff {} {}.bak
+```
+
+## Troubleshooting
+
+### 1. Common Issues
+- Line ending differences
+- Encoding issues
+- Hidden characters
+- Permission problems
+
+### 2. Solutions
+```bash
+# Fix line endings
+dos2unix file
+unix2dos file
+
+# Check encoding
+file -i file
+iconv -f ISO-8859-1 -t UTF-8 file
+```
+
+### 3. Debugging
+```bash
+# Show hidden chars
+cat -A file
+hexdump -C file
+
+# Check permissions
+ls -l file
+stat file
+```
+
+## Best Practices
+
+### 1. File Handling
+- Backup before comparing
+- Check file permissions
+- Verify file integrity
+- Use appropriate tools
+
+### 2. Performance
+- Split large files
+- Use efficient algorithms
+- Monitor resource usage
+- Clean up temporary files
+
+### 3. Security
+- Verify file sources
+- Check file permissions
+- Handle sensitive data
+- Monitor access logs
+
+## Additional Resources
+
+### 1. Man Pages
+```bash
+man diff
+man vimdiff
+man comm
+man cmp
+```
+
+### 2. Documentation
+- GNU Diffutils
+- Vim Documentation
+- Text Processing Tools
+- File Comparison Guide
+
+### 3. Tools
+- File comparators
+- Text processors
+- Monitoring tools
+- Version control

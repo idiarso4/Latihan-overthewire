@@ -1,0 +1,294 @@
+# Bandit Level 20 → Level 21
+
+## Level Goal
+Menemukan password untuk level selanjutnya dengan menggunakan setuid binary yang diberikan. Binary ini akan membuat koneksi ke localhost pada port yang kita tentukan. Binary akan membaca baris teks dari koneksi dan membandingkannya dengan password level saat ini. Jika password benar, binary akan memberikan password level berikutnya.
+
+## Detailed Command Breakdown
+
+### 1. SSH Connection
+```bash
+ssh bandit20@bandit.labs.overthewire.org -p 2220
+```
+
+### 2. Network Setup
+```bash
+# Start netcat listener
+nc -l -p port
+
+# Execute setuid binary
+./suconnect port
+
+# Using multiple terminals
+tmux new-session -d 'nc -l -p port'
+screen -dm nc -l -p port
+```
+
+## Network Programming
+
+### 1. Socket Creation
+```bash
+# TCP server
+nc -l -p port
+socat TCP-LISTEN:port -
+
+# TCP client
+nc host port
+socat - TCP:host:port
+
+# UDP communication
+nc -u -l -p port
+nc -u host port
+```
+
+### 2. Connection Handling
+```bash
+# Accept connections
+nc -l -p port -k
+socat TCP-LISTEN:port,fork -
+
+# Send data
+echo "data" | nc host port
+printf "data\n" | nc host port
+
+# Receive data
+nc -l -p port > file
+nc -l -p port | process
+```
+
+### 3. Protocol Implementation
+```bash
+# HTTP server
+while true; do nc -l -p 80 < response.http; done
+
+# Echo server
+nc -l -p port -k -c 'xargs -I% echo "%"'
+
+# Custom protocol
+nc -l -p port -k -c './handler'
+```
+
+## Process Communication
+
+### 1. Inter-Process Communication
+```bash
+# Named pipes
+mkfifo pipe
+cat < pipe | process
+echo "data" > pipe
+
+# Shared memory
+ipcs -m
+ipcrm -m id
+
+# Message queues
+ipcs -q
+ipcrm -q id
+```
+
+### 2. Process Synchronization
+```bash
+# File locking
+flock -x file command
+flock -s file command
+
+# Semaphores
+ipcs -s
+ipcrm -s id
+
+# Process groups
+kill -TERM -pid
+```
+
+### 3. Signal Handling
+```bash
+# Send signals
+kill -SIGUSR1 pid
+pkill -SIGUSR1 process
+
+# Trap signals
+trap 'handler' SIGUSR1
+trap 'cleanup' EXIT
+```
+
+## Network Services
+
+### 1. Service Management
+```bash
+# Start service
+systemctl start service
+service service start
+
+# Check status
+systemctl status service
+service service status
+
+# Stop service
+systemctl stop service
+service service stop
+```
+
+### 2. Port Management
+```bash
+# List ports
+netstat -tuln
+ss -tuln
+
+# Check specific port
+lsof -i :port
+fuser port/tcp
+```
+
+### 3. Service Discovery
+```bash
+# Service scan
+nmap -sV host
+nc -zv host port-range
+
+# DNS lookup
+dig service.domain
+host service.domain
+```
+
+## Security Considerations
+
+### 1. Network Security
+```bash
+# Firewall rules
+iptables -A INPUT -p tcp --dport port -j ACCEPT
+ufw allow port/tcp
+
+# Connection limits
+iptables -A INPUT -p tcp --dport port -m limit
+
+# Access control
+tcp_wrapper host.allow
+tcp_wrapper host.deny
+```
+
+### 2. Process Security
+```bash
+# Process isolation
+chroot /path command
+firejail command
+
+# Resource limits
+ulimit -n 1024
+nice -n 19 command
+```
+
+### 3. Service Hardening
+```bash
+# Secure configuration
+chmod 600 config
+chown root:root config
+
+# Service user
+useradd -r service
+sudo -u service command
+```
+
+## Performance Optimization
+
+### 1. Connection Handling
+```bash
+# Connection pooling
+socat TCP-LISTEN:port,fork,reuseaddr -
+
+# Load balancing
+haproxy -f config
+nginx -c config
+```
+
+### 2. Process Management
+```bash
+# Process priority
+renice +10 -p pid
+chrt -f -p 50 pid
+
+# Resource allocation
+taskset -c 0-3 command
+cgroups-mount
+```
+
+### 3. Network Tuning
+```bash
+# TCP settings
+sysctl net.ipv4.tcp_keepalive_time
+sysctl net.core.somaxconn
+
+# Buffer sizes
+sysctl net.core.rmem_max
+sysctl net.core.wmem_max
+```
+
+## Troubleshooting
+
+### 1. Common Issues
+- Connection refused
+- Port in use
+- Process hung
+- Resource exhaustion
+
+### 2. Solutions
+```bash
+# Debug connection
+nc -zv host port
+telnet host port
+
+# Check process
+ps aux | grep process
+strace -p pid
+```
+
+### 3. Logging
+```bash
+# System logs
+tail -f /var/log/syslog
+journalctl -f
+
+# Network traffic
+tcpdump -i any port port
+wireshark -i any -f "port port"
+```
+
+## Best Practices
+
+### 1. Network
+- Use timeouts
+- Handle errors
+- Clean connections
+- Monitor traffic
+
+### 2. Process
+- Proper isolation
+- Resource limits
+- Error handling
+- Clean shutdown
+
+### 3. Security
+- Minimal privileges
+- Access control
+- Input validation
+- Secure defaults
+
+## Additional Resources
+
+### 1. Man Pages
+```bash
+man nc
+man socat
+man systemd
+man iptables
+```
+
+### 2. Documentation
+- Network Programming
+- Process Management
+- Security Guide
+- Performance Tuning
+
+### 3. Tools
+- Network utilities
+- Process monitors
+- Security tools
+- Debug helpers

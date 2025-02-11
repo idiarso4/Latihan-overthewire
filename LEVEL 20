@@ -1,0 +1,297 @@
+# Bandit Level 19 → Level 20
+
+## Level Goal
+Menemukan password untuk level selanjutnya menggunakan setuid binary yang ada di home directory untuk mengakses file password di /etc/bandit_pass.
+
+## Detailed Command Breakdown
+
+### 1. SSH Connection
+```bash
+ssh bandit19@bandit.labs.overthewire.org -p 2220
+```
+
+### 2. Setuid Binary Usage
+```bash
+# Check file permissions
+ls -l bandit20-do
+
+# Execute as different user
+./bandit20-do cat /etc/bandit_pass/bandit20
+
+# Check file type
+file bandit20-do
+```
+
+## Setuid Binaries
+
+### 1. Permission Management
+```bash
+# View permissions
+ls -l file
+stat file
+
+# Set SUID bit
+chmod u+s file
+chmod 4755 file
+
+# Remove SUID
+chmod u-s file
+chmod 0755 file
+```
+
+### 2. Process Execution
+```bash
+# Execute as owner
+./suid_binary
+
+# Execute with arguments
+./suid_binary arg1 arg2
+
+# Execute with environment
+env VAR=value ./suid_binary
+```
+
+### 3. Security Context
+```bash
+# Check process owner
+ps -ef | grep process
+
+# Check capabilities
+getcap file
+setcap cap_name+ep file
+
+# Check security context
+ls -Z file
+ps -Z
+```
+
+## Process Management
+
+### 1. Process Information
+```bash
+# List processes
+ps aux
+ps -ef
+
+# Process tree
+pstree
+ps auxf
+
+# Process details
+top
+htop
+```
+
+### 2. Process Control
+```bash
+# Send signals
+kill PID
+killall process_name
+
+# Priority control
+nice -n 10 command
+renice 10 PID
+
+# Resource limits
+ulimit -a
+```
+
+### 3. Process Monitoring
+```bash
+# System activity
+vmstat
+iostat
+sar
+
+# Process tracking
+strace command
+ltrace command
+```
+
+## File Permissions
+
+### 1. Basic Permissions
+```bash
+# View permissions
+ls -l file
+stat file
+
+# Modify permissions
+chmod 644 file
+chmod u=rw,g=r,o=r file
+
+# Change owner
+chown user:group file
+```
+
+### 2. Special Permissions
+```bash
+# Set special bits
+chmod +s file      # SUID/SGID
+chmod +t dir       # Sticky bit
+
+# View special permissions
+ls -la file
+stat file
+```
+
+### 3. Access Control Lists
+```bash
+# View ACL
+getfacl file
+
+# Set ACL
+setfacl -m u:user:rwx file
+setfacl -m g:group:rx file
+
+# Remove ACL
+setfacl -x u:user file
+```
+
+## Security Considerations
+
+### 1. SUID Management
+```bash
+# Find SUID files
+find / -perm -4000 2>/dev/null
+
+# Find SGID files
+find / -perm -2000 2>/dev/null
+
+# Find world-writable
+find / -perm -2 2>/dev/null
+```
+
+### 2. Process Security
+```bash
+# Restrict capabilities
+capsh --print
+setcap cap_net_raw-ep file
+
+# Sandbox execution
+firejail program
+chroot /path program
+```
+
+### 3. Access Control
+```bash
+# Mandatory Access Control
+semanage fcontext -a -t type file
+restorecon file
+
+# AppArmor profiles
+aa-status
+aa-complain program
+```
+
+## System Monitoring
+
+### 1. Resource Usage
+```bash
+# CPU usage
+top
+mpstat
+
+# Memory usage
+free -h
+vmstat
+
+# Disk usage
+df -h
+iostat
+```
+
+### 2. Process Activity
+```bash
+# Process accounting
+lastcomm
+acct
+
+# System calls
+strace -c command
+ltrace -c command
+```
+
+### 3. Audit Logging
+```bash
+# View audit logs
+ausearch -f file
+aureport
+
+# Configure auditing
+auditctl -w file -p rwxa
+autrace command
+```
+
+## Troubleshooting
+
+### 1. Common Issues
+- Permission denied
+- Operation not permitted
+- No such file
+- Resource limits
+
+### 2. Solutions
+```bash
+# Check permissions
+ls -l file
+namei -l /path/to/file
+
+# Check capabilities
+getcap file
+capsh --print
+```
+
+### 3. Debugging
+```bash
+# System calls
+strace command 2>&1 | less
+
+# Library calls
+ltrace command 2>&1 | less
+
+# Process info
+cat /proc/PID/status
+```
+
+## Best Practices
+
+### 1. Security
+- Minimize SUID usage
+- Regular audits
+- Proper permissions
+- Process isolation
+
+### 2. Performance
+- Resource limits
+- Process priority
+- Memory management
+- Disk I/O control
+
+### 3. Maintenance
+- Regular monitoring
+- Log rotation
+- Security updates
+- Access review
+
+## Additional Resources
+
+### 1. Man Pages
+```bash
+man capabilities
+man setuid
+man chmod
+man chown
+```
+
+### 2. Documentation
+- Linux Security Guide
+- Process Management
+- Access Control
+- System Monitoring
+
+### 3. Tools
+- Security scanners
+- Process monitors
+- Audit tools
+- System utilities

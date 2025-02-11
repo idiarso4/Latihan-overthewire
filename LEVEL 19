@@ -1,0 +1,251 @@
+# Bandit Level 18 → Level 19
+
+## Level Goal
+Menemukan password untuk level selanjutnya yang tersimpan dalam file readme di home directory. Namun, bashrc telah dimodifikasi untuk melakukan logout saat login via SSH.
+
+## Detailed Command Breakdown
+
+### 1. SSH Command Execution
+```bash
+# Execute command directly via SSH
+ssh bandit18@bandit.labs.overthewire.org -p 2220 cat readme
+
+# Using different shell
+ssh bandit18@bandit.labs.overthewire.org -p 2220 /bin/sh
+
+# With pseudo-terminal allocation
+ssh -t bandit18@bandit.labs.overthewire.org -p 2220 /bin/bash
+```
+
+## SSH Advanced Usage
+
+### 1. Command Execution
+```bash
+# Basic command
+ssh user@host command
+
+# Multiple commands
+ssh user@host "cmd1 && cmd2"
+
+# With environment variables
+ssh user@host "export VAR=value; command"
+
+# Using heredoc
+ssh user@host << 'EOF'
+command1
+command2
+EOF
+```
+
+### 2. Shell Selection
+```bash
+# Specific shell
+ssh user@host /bin/bash
+ssh user@host /bin/sh
+ssh user@host /bin/zsh
+
+# Interactive shell
+ssh -t user@host /bin/bash
+
+# Non-interactive
+ssh -T user@host command
+```
+
+### 3. Terminal Control
+```bash
+# Force pseudo-terminal
+ssh -tt user@host
+
+# No pseudo-terminal
+ssh -T user@host
+
+# Custom terminal
+ssh -t user@host TERM=xterm command
+```
+
+## Remote File Operations
+
+### 1. File Reading
+```bash
+# Cat file
+ssh user@host cat file
+
+# Head/tail
+ssh user@host head file
+ssh user@host tail -n 100 file
+
+# With grep
+ssh user@host "grep pattern file"
+```
+
+### 2. File Transfer
+```bash
+# Using tar
+ssh user@host "tar czf - dir" > backup.tar.gz
+ssh user@host "cat file" > local_file
+
+# Using dd
+ssh user@host "dd if=file" > local_file
+```
+
+### 3. File Processing
+```bash
+# Process then transfer
+ssh user@host "process_file | gzip" > file.gz
+
+# Local processing of remote file
+ssh user@host cat file | local_process
+
+# Remote processing of local file
+cat file | ssh user@host "remote_process"
+```
+
+## Session Management
+
+### 1. Connection Options
+```bash
+# Keep alive
+ssh -o ServerAliveInterval=60 user@host
+
+# Connection sharing
+ssh -o ControlMaster=auto user@host
+ssh -o ControlPath=/tmp/ssh-%r@%h:%p user@host
+
+# Compression
+ssh -C user@host
+```
+
+### 2. Authentication
+```bash
+# Specify key
+ssh -i key_file user@host
+
+# Agent forwarding
+ssh -A user@host
+
+# Port forwarding
+ssh -L local_port:remote_host:remote_port user@host
+```
+
+### 3. Environment
+```bash
+# Set variables
+ssh -o SendEnv=VAR user@host
+
+# X11 forwarding
+ssh -X user@host
+
+# No shell
+ssh -N user@host
+```
+
+## Security Considerations
+
+### 1. Access Control
+```bash
+# Restrict commands
+command="ls" ssh-rsa KEY...
+
+# Force command
+ssh -o ForceCommand="command" user@host
+
+# No shell access
+ssh -N user@host
+```
+
+### 2. Connection Security
+```bash
+# Specific cipher
+ssh -c aes256-gcm@openssh.com user@host
+
+# Host key verification
+ssh -o StrictHostKeyChecking=yes user@host
+
+# No password auth
+ssh -o PasswordAuthentication=no user@host
+```
+
+### 3. Logging
+```bash
+# Verbose output
+ssh -v user@host
+ssh -vv user@host
+ssh -vvv user@host
+
+# Debug logging
+ssh -E log_file user@host
+```
+
+## Troubleshooting
+
+### 1. Common Issues
+- Connection refused
+- Authentication failure
+- Command execution errors
+- Shell problems
+
+### 2. Solutions
+```bash
+# Debug connection
+ssh -v user@host
+
+# Test connectivity
+nc -zv host 22
+
+# Check command
+ssh -T user@host command
+```
+
+### 3. Debugging
+```bash
+# Connection debug
+ssh -vvv user@host
+
+# Command output
+ssh user@host command 2>&1
+
+# System logs
+tail -f /var/log/auth.log
+```
+
+## Best Practices
+
+### 1. Security
+- Use key authentication
+- Verify host keys
+- Monitor connections
+- Restrict commands
+
+### 2. Performance
+- Use compression
+- Share connections
+- Optimize settings
+- Clean up sessions
+
+### 3. Maintenance
+- Regular key rotation
+- Log monitoring
+- Session cleanup
+- Access review
+
+## Additional Resources
+
+### 1. Man Pages
+```bash
+man ssh
+man sshd
+man ssh_config
+man authorized_keys
+```
+
+### 2. Documentation
+- OpenSSH Guide
+- Security Best Practices
+- Command Execution
+- Session Management
+
+### 3. Tools
+- SSH clients
+- Key managers
+- Session handlers
+- Monitoring tools

@@ -1,0 +1,318 @@
+# Bandit Level 21 → Level 22
+
+## Level Goal
+Menemukan password untuk level selanjutnya dengan mempelajari bagaimana cron jobs digunakan untuk menjalankan task secara terjadwal di sistem.
+
+## Detailed Command Breakdown
+
+### 1. SSH Connection
+```bash
+ssh bandit21@bandit.labs.overthewire.org -p 2220
+```
+
+### 2. Cron Investigation
+```bash
+# View crontab directory
+ls -l /etc/cron.d/
+
+# View specific cron job
+cat /etc/cron.d/cronjob_bandit22
+
+# Check script permissions
+ls -l /usr/bin/cronjob_bandit22.sh
+```
+
+## Cron Management
+
+### 1. Crontab Operations
+```bash
+# List crontabs
+crontab -l
+ls /etc/cron.d/
+
+# Edit crontab
+crontab -e
+EDITOR=vim crontab -e
+
+# Remove crontab
+crontab -r
+```
+
+### 2. Cron Directories
+```bash
+# System cron dirs
+ls /etc/cron.daily/
+ls /etc/cron.hourly/
+ls /etc/cron.monthly/
+ls /etc/cron.weekly/
+```
+
+### 3. Cron Security
+```bash
+# View allowed users
+cat /etc/cron.allow
+
+# View denied users
+cat /etc/cron.deny
+
+# Check permissions
+ls -l /etc/cron*
+```
+
+## Job Scheduling
+
+### 1. Cron Syntax
+```bash
+# Basic format
+* * * * * command
+#min hour day month weekday
+
+# Common patterns
+0 * * * *     # Every hour
+*/15 * * * *  # Every 15 minutes
+0 0 * * *     # Daily at midnight
+```
+
+### 2. At Jobs
+```bash
+# Schedule job
+at now + 1 hour
+at 23:00
+
+# List jobs
+atq
+at -l
+
+# Remove job
+atrm job_number
+```
+
+### 3. Systemd Timers
+```bash
+# List timers
+systemctl list-timers
+
+# Create timer
+systemctl enable timer
+systemctl start timer
+
+# Check status
+systemctl status timer
+```
+
+## Script Management
+
+### 1. Script Permissions
+```bash
+# Set executable
+chmod +x script.sh
+chmod 755 script.sh
+
+# Set owner
+chown user:group script.sh
+
+# Set SUID
+chmod u+s script.sh
+```
+
+### 2. Script Logging
+```bash
+# Basic logging
+script.sh >> /var/log/script.log 2>&1
+
+# With timestamp
+script.sh 2>&1 | ts >> /var/log/script.log
+
+# Rotate logs
+logrotate config
+```
+
+### 3. Script Debugging
+```bash
+# Debug mode
+bash -x script.sh
+
+# Trace execution
+set -x
+set -e
+
+# Debug output
+echo "Debug: $var" >&2
+```
+
+## System Automation
+
+### 1. Task Automation
+```bash
+# Simple tasks
+watch -n 60 command
+while true; do command; sleep 60; done
+
+# Complex tasks
+ansible-playbook playbook.yml
+puppet apply manifest.pp
+```
+
+### 2. Process Control
+```bash
+# Start on boot
+update-rc.d service defaults
+
+# Systemd service
+systemctl enable service
+systemctl disable service
+
+# Init script
+/etc/init.d/service start
+```
+
+### 3. Job Monitoring
+```bash
+# Check status
+systemctl status service
+service service status
+
+# View logs
+journalctl -u service
+tail -f /var/log/syslog
+```
+
+## Security Considerations
+
+### 1. Script Security
+```bash
+# Set safe path
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# Secure temp files
+tempfile=$(mktemp)
+trap 'rm -f $tempfile' EXIT
+```
+
+### 2. Permission Control
+```bash
+# Restrict access
+chmod 700 script.sh
+chown root:root script.sh
+
+# Set capabilities
+setcap cap_net_bind_service=+ep script
+```
+
+### 3. Environment Security
+```bash
+# Clear environment
+env -i script.sh
+
+# Set secure umask
+umask 077
+
+# Restrict sudo
+sudo -l
+```
+
+## Performance Optimization
+
+### 1. Resource Management
+```bash
+# CPU priority
+nice -n 19 script.sh
+renice +19 -p $$
+
+# Memory limits
+ulimit -v 512000
+cgroups-mount
+```
+
+### 2. Parallel Execution
+```bash
+# GNU Parallel
+parallel script.sh ::: input*
+
+# Background jobs
+script.sh & script2.sh &
+wait
+```
+
+### 3. Load Distribution
+```bash
+# Load average
+uptime
+w
+
+# Process limits
+ulimit -a
+/etc/security/limits.conf
+```
+
+## Troubleshooting
+
+### 1. Common Issues
+- Script permissions
+- Path problems
+- Resource limits
+- Lock files
+
+### 2. Solutions
+```bash
+# Check permissions
+ls -l script.sh
+namei -l script.sh
+
+# Debug execution
+bash -x script.sh
+strace ./script.sh
+```
+
+### 3. Logging
+```bash
+# System logs
+tail -f /var/log/syslog
+journalctl -f
+
+# Script logs
+script.sh 2>&1 | tee log
+exec 2> >(tee -a error.log)
+```
+
+## Best Practices
+
+### 1. Script Writing
+- Use shellcheck
+- Error handling
+- Clean exit
+- Proper logging
+
+### 2. Security
+- Minimal privileges
+- Input validation
+- Secure paths
+- Lock files
+
+### 3. Maintenance
+- Documentation
+- Version control
+- Testing
+- Monitoring
+
+## Additional Resources
+
+### 1. Man Pages
+```bash
+man crontab
+man at
+man systemd.timer
+man bash
+```
+
+### 2. Documentation
+- Cron Format
+- Shell Scripting
+- System Automation
+- Security Guide
+
+### 3. Tools
+- Cron utilities
+- Script checkers
+- Monitoring tools
+- Debug helpers

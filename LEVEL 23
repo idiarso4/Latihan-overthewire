@@ -1,0 +1,341 @@
+# Bandit Level 22 → Level 23
+
+## Level Goal
+Menemukan password untuk level selanjutnya dengan menganalisis script shell yang dijalankan oleh cron dan memahami bagaimana script tersebut memproses variabel untuk menghasilkan nama file yang berisi password.
+
+## Detailed Command Breakdown
+
+### 1. SSH Connection
+```bash
+ssh bandit22@bandit.labs.overthewire.org -p 2220
+```
+
+### 2. Script Analysis
+```bash
+# View cron job
+cat /etc/cron.d/cronjob_bandit23
+
+# Examine script
+cat /usr/bin/cronjob_bandit23.sh
+
+# Test script execution
+bash -x /usr/bin/cronjob_bandit23.sh
+```
+
+## Shell Scripting
+
+### 1. Variable Manipulation
+```bash
+# String operations
+${variable#pattern}    # Remove prefix
+${variable%pattern}    # Remove suffix
+${variable/old/new}    # Replace first
+${variable//old/new}   # Replace all
+
+# Length and substring
+${#variable}           # Length
+${variable:start:len}  # Substring
+
+# Default values
+${variable:-default}   # Use default
+${variable:=default}   # Set default
+```
+
+### 2. Command Substitution
+```bash
+# Basic substitution
+result=$(command)
+result=`command`
+
+# Nested commands
+outer=$(inner $(deepest))
+
+# With pipes
+result=$(command | process)
+```
+
+### 3. Parameter Expansion
+```bash
+# Array operations
+${array[*]}           # All elements
+${array[@]}           # All elements
+${#array[*]}          # Array length
+
+# Pattern matching
+${variable#pattern}   # Remove prefix
+${variable##pattern}  # Remove longest prefix
+${variable%pattern}   # Remove suffix
+${variable%%pattern}  # Remove longest suffix
+```
+
+## Script Functions
+
+### 1. Function Definition
+```bash
+# Basic function
+function_name() {
+    commands
+}
+
+# With parameters
+function name {
+    echo "$1"
+    return $?
+}
+```
+
+### 2. Function Usage
+```bash
+# Call function
+function_name
+function_name arg1 arg2
+
+# Store result
+result=$(function_name)
+status=$?
+```
+
+### 3. Function Libraries
+```bash
+# Source library
+. /path/to/library
+source /path/to/library
+
+# Function export
+export -f function_name
+```
+
+## File Operations
+
+### 1. File Testing
+```bash
+# File type
+[ -f file ]  # Regular file
+[ -d dir ]   # Directory
+[ -L link ]  # Symbolic link
+
+# File permissions
+[ -r file ]  # Readable
+[ -w file ]  # Writable
+[ -x file ]  # Executable
+```
+
+### 2. File Processing
+```bash
+# Read file
+while IFS= read -r line; do
+    process "$line"
+done < file
+
+# Write file
+{
+    echo "line 1"
+    echo "line 2"
+} > file
+```
+
+### 3. File Manipulation
+```bash
+# Create temp file
+tempfile=$(mktemp)
+trap 'rm -f $tempfile' EXIT
+
+# Process and save
+process > "$tempfile" && mv "$tempfile" final
+```
+
+## String Processing
+
+### 1. String Operations
+```bash
+# String comparison
+[ "$str1" = "$str2" ]
+[[ $str1 == $str2 ]]
+
+# Pattern matching
+[[ $str =~ $regex ]]
+[[ $str == *pattern* ]]
+
+# String transformation
+${str^^}  # Uppercase
+${str,,}  # Lowercase
+```
+
+### 2. Text Processing
+```bash
+# Cut fields
+cut -d: -f1 file
+cut -c1-10 file
+
+# Sort and unique
+sort -u file
+sort | uniq -c
+
+# Replace text
+sed 's/old/new/g' file
+tr 'old' 'new' < file
+```
+
+### 3. Advanced Processing
+```bash
+# AWK processing
+awk -F: '{print $1}' file
+awk 'NR%2==0' file
+
+# Perl processing
+perl -pe 's/old/new/g' file
+perl -ne 'print if /pattern/' file
+```
+
+## Error Handling
+
+### 1. Exit Status
+```bash
+# Check status
+if [ $? -eq 0 ]; then
+    success
+else
+    failure
+fi
+
+# Set exit code
+exit 1
+```
+
+### 2. Error Trapping
+```bash
+# Trap errors
+trap 'error_handler' ERR
+
+# Cleanup trap
+trap 'cleanup' EXIT
+
+# Debug trap
+trap 'debug_handler' DEBUG
+```
+
+### 3. Error Logging
+```bash
+# Log to file
+exec 2>> error.log
+
+# Log with timestamp
+exec 2> >(ts >> error.log)
+
+# Tee output
+exec 2> >(tee -a error.log)
+```
+
+## Security Considerations
+
+### 1. Input Validation
+```bash
+# Check arguments
+[ $# -eq 2 ] || exit 1
+
+# Validate input
+[[ $input =~ ^[0-9]+$ ]] || exit 1
+
+# Sanitize variables
+input=${input//[^a-zA-Z0-9]/}
+```
+
+### 2. Path Security
+```bash
+# Set safe path
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# Use full paths
+/usr/bin/command
+
+# Quote variables
+"$variable"
+```
+
+### 3. Temporary Files
+```bash
+# Secure temp files
+tempfile=$(mktemp)
+chmod 600 "$tempfile"
+
+# Clean up
+trap 'rm -f "$tempfile"' EXIT
+```
+
+## Debugging Techniques
+
+### 1. Debug Options
+```bash
+# Enable debugging
+set -x
+set -e
+
+# Trace execution
+bash -x script.sh
+PS4='${BASH_SOURCE}:${LINENO}: ' bash -x script.sh
+```
+
+### 2. Debug Output
+```bash
+# Print variables
+declare -p variable
+set | grep variable
+
+# Stack trace
+caller
+${FUNCNAME[@]}
+```
+
+### 3. Debug Tools
+```bash
+# Shell check
+shellcheck script.sh
+
+# Syntax check
+bash -n script.sh
+
+# Profile execution
+PS4='+ $EPOCHREALTIME ' bash -x script.sh
+```
+
+## Best Practices
+
+### 1. Script Structure
+- Clear documentation
+- Modular functions
+- Error handling
+- Clean exit
+
+### 2. Security
+- Input validation
+- Path security
+- Minimal privileges
+- Secure temp files
+
+### 3. Maintenance
+- Version control
+- Testing
+- Documentation
+- Logging
+
+## Additional Resources
+
+### 1. Man Pages
+```bash
+man bash
+man test
+man sed
+man awk
+```
+
+### 2. Documentation
+- Bash Guide
+- Shell Scripting
+- Text Processing
+- Security Best Practices
+
+### 3. Tools
+- Shellcheck
+- Debug tools
+- Text processors
+- Security scanners
