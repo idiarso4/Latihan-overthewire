@@ -1,73 +1,277 @@
 # Bandit Level 7 → Level 8
 
 ## Level Goal
-Menemukan password untuk level selanjutnya yang tersimpan dalam file `data.txt` di sebelah kata "millionth".
+Menemukan password untuk level selanjutnya yang tersimpan dalam file `data.txt` di sebelah kata `millionth`.
 
-## Langkah Penyelesaian
+## Detailed Command Breakdown
 
-1. Login ke server menggunakan SSH:
-   ```bash
-   ssh bandit7@bandit.labs.overthewire.org -p 2220
-   ```
-   (Gunakan password yang didapat dari level sebelumnya)
+### 1. SSH Connection
+```bash
+ssh bandit7@bandit.labs.overthewire.org -p 2220
+```
 
-2. Verifikasi keberadaan file data.txt:
-   ```bash
-   ls -l data.txt
-   ```
+### 2. Text Processing Commands
 
-3. Gunakan `grep` untuk mencari baris yang mengandung kata "millionth":
-   ```bash
-   grep "millionth" data.txt
-   ```
-   atau
-   ```bash
-   cat data.txt | grep "millionth"
-   ```
+#### 2.1 Basic Search
+```bash
+# Using grep
+grep "millionth" data.txt
 
-4. Password akan muncul di sebelah kata "millionth"
+# Using awk
+awk '/millionth/ {print}' data.txt
 
-5. Salin password dan logout:
-   ```bash
-   exit
-   ```
+# Using sed
+sed -n '/millionth/p' data.txt
+```
 
-## Penjelasan Teknis
+#### 2.2 Advanced Search
+```bash
+# Context lines
+grep -A1 "millionth" data.txt  # Show line after
+grep -B1 "millionth" data.txt  # Show line before
+grep -C1 "millionth" data.txt  # Show context
 
-### Perintah Grep
-- Mencari pattern dalam text
-- Format: `grep [options] pattern [file...]`
-- Case sensitive secara default
-- Bisa digunakan dengan pipe (`|`)
+# With line numbers
+grep -n "millionth" data.txt
+```
 
-### Opsi Grep yang Berguna
-- `-i`: case insensitive
-- `-n`: tampilkan nomor baris
-- `-v`: inverse match (tampilkan baris yang tidak cocok)
-- `-r`: recursive search
-- `-c`: hitung jumlah match
+## Text Processing Tools
 
-### Penggunaan Pipe (|)
-- Mengirim output satu command ke command lain
-- Format: `command1 | command2`
-- Berguna untuk memproses data bertahap
-- Bisa dirangkai lebih dari dua command
+### 1. Grep Command
+```bash
+# Basic patterns
+grep "pattern" file
+grep -i "PATTERN" file  # Case insensitive
+grep -w "word" file     # Whole words only
 
-## Tips
-- Gunakan grep untuk mencari text dalam file besar
-- Kombinasikan dengan pipe untuk pemrosesan lebih lanjut
-- Perhatikan case sensitivity saat mencari
-- Gunakan opsi grep sesuai kebutuhan
+# Regular expressions
+grep -E "regex" file    # Extended regex
+grep -P "perl" file     # Perl regex
 
-## Konsep yang Dipelajari
-- Text searching dengan grep
-- Penggunaan pipe di Linux
-- Processing file text besar
-- Pattern matching
-- Command chaining dengan pipe
+# Multiple patterns
+grep -e "pattern1" -e "pattern2" file
+grep -f patterns.txt file
+```
 
-## Catatan Tambahan
-- File data.txt mungkin sangat besar
-- Grep sangat efisien untuk mencari dalam file besar
-- Tidak perlu membaca seluruh file secara manual
-- Pattern matching bisa lebih kompleks dengan regex
+### 2. Awk Command
+```bash
+# Field processing
+awk '{print $1}' file         # First field
+awk '{print $1,$3}' file      # Multiple fields
+awk -F: '{print $1}' file     # Custom delimiter
+
+# Pattern matching
+awk '/pattern/ {print $0}'    # Lines with pattern
+awk '$1 == "value" {print}'   # Field matching
+awk 'length($0) > 80'         # Long lines
+```
+
+### 3. Sed Command
+```bash
+# Substitution
+sed 's/old/new/' file         # First occurrence
+sed 's/old/new/g' file        # All occurrences
+sed 's/old/new/2' file        # Second occurrence
+
+# Line operations
+sed '1d' file                 # Delete first line
+sed '$d' file                 # Delete last line
+sed '1,5d' file              # Delete range
+```
+
+## Pattern Matching
+
+### 1. Regular Expressions
+```bash
+# Basic patterns
+.       # Any character
+^       # Start of line
+$       # End of line
+*       # Zero or more
++       # One or more
+?       # Zero or one
+[]      # Character class
+```
+
+### 2. Extended Patterns
+```bash
+# Quantifiers
+{n}     # Exactly n times
+{n,}    # At least n times
+{n,m}   # Between n and m times
+
+# Groups
+(...)   # Capture group
+(?:...) # Non-capturing group
+\1      # Back reference
+```
+
+### 3. Character Classes
+```bash
+[[:alpha:]]  # Alphabetic chars
+[[:digit:]]  # Numeric chars
+[[:alnum:]]  # Alphanumeric
+[[:space:]]  # Whitespace
+[[:punct:]]  # Punctuation
+```
+
+## Text Analysis Tools
+
+### 1. Basic Analysis
+```bash
+# Word count
+wc file              # Lines, words, chars
+wc -l file          # Lines only
+wc -w file          # Words only
+
+# Character count
+grep -o . file | wc -l
+tr -cd char < file | wc -c
+```
+
+### 2. Pattern Statistics
+```bash
+# Frequency analysis
+sort file | uniq -c
+grep -o . file | sort | uniq -c
+awk '{print $1}' file | sort | uniq -c
+```
+
+### 3. Text Properties
+```bash
+# Line length
+awk '{print length}' file
+sed -n '/^.\{80\}/p' file
+grep '^.\{80\}' file
+```
+
+## Performance Optimization
+
+### 1. Efficient Search
+```bash
+# Using index
+grep -F "exact" file          # Fixed strings
+grep -x "whole line" file     # Exact lines
+grep -m1 "first" file        # Stop after first
+
+# Memory usage
+grep --mmap pattern file     # Memory mapping
+grep --line-buffered pattern # Line buffering
+```
+
+### 2. Large Files
+```bash
+# Streaming processing
+tail -f file | grep pattern
+cat file | grep pattern
+
+# Parallel processing
+parallel grep pattern ::: files
+xargs -P4 grep pattern < files
+```
+
+### 3. Resource Management
+```bash
+# Process limits
+ulimit -n 1024               # File descriptors
+nice grep pattern file       # Lower priority
+ionice -c2 grep pattern file # I/O priority
+```
+
+## Advanced Techniques
+
+### 1. Complex Processing
+```bash
+# Multiple operations
+grep pattern | sort | uniq
+awk '/pattern/ {print $2}' | sort -n
+sed -n '1~2p' | grep pattern
+```
+
+### 2. Custom Functions
+```bash
+# Awk functions
+awk '
+function process(str) {
+    return toupper(str)
+}
+{print process($1)}
+'
+```
+
+### 3. Script Integration
+```bash
+#!/bin/bash
+while IFS= read -r line; do
+    [[ $line =~ pattern ]] && process_line "$line"
+done < file
+```
+
+## Troubleshooting
+
+### 1. Common Issues
+- Pattern not found
+- Case sensitivity
+- Special characters
+- File encoding
+
+### 2. Debugging
+```bash
+# Verbose output
+grep -v pattern file
+set -x; command; set +x
+strace command
+```
+
+### 3. Error Handling
+```bash
+# Check exit status
+if grep -q pattern file; then
+    echo "Found"
+fi
+
+# Handle errors
+command || echo "Error: $?"
+```
+
+## Best Practices
+
+### 1. Pattern Design
+- Use specific patterns
+- Consider boundaries
+- Handle special cases
+- Test edge cases
+
+### 2. Performance
+- Choose right tool
+- Optimize patterns
+- Use appropriate options
+- Consider resource usage
+
+### 3. Maintenance
+- Document patterns
+- Version control
+- Regular testing
+- Update documentation
+
+## Additional Resources
+
+### 1. Man Pages
+```bash
+man grep
+man awk
+man sed
+man regex
+```
+
+### 2. Documentation
+- GNU Text Processing
+- Regular Expressions
+- Shell Scripting
+- Performance Tuning
+
+### 3. Tools
+- Text editors
+- Pattern testers
+- Performance tools
+- Debugging utilities

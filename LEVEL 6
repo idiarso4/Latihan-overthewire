@@ -1,72 +1,311 @@
 # Bandit Level 5 → Level 6
 
 ## Level Goal
-Menemukan password untuk level selanjutnya yang tersimpan dalam file dengan kriteria berikut:
-- Dapat dibaca manusia (human-readable)
-- Ukuran tepat 1033 bytes
-- Tidak executable
-- Berada di dalam direktori `inhere`
+Menemukan password untuk level selanjutnya yang tersimpan dalam file dengan properti spesifik:
+- human-readable
+- 1033 bytes in size
+- not executable
 
-## Langkah Penyelesaian
+## Detailed Command Breakdown
 
-1. Login ke server menggunakan SSH:
-   ```bash
-   ssh bandit5@bandit.labs.overthewire.org -p 2220
-   ```
-   (Gunakan password yang didapat dari level sebelumnya)
+### 1. SSH Connection
+```bash
+ssh bandit5@bandit.labs.overthewire.org -p 2220
+```
 
-2. Masuk ke direktori `inhere`:
-   ```bash
-   cd inhere
-   ```
+### 2. Advanced File Search
 
-3. Gunakan perintah `find` dengan kriteria yang diminta:
-   ```bash
-   find . -type f -size 1033c ! -executable -exec file {} \; | grep "ASCII text"
-   ```
-   
-4. Setelah menemukan file yang sesuai, baca isinya dengan `cat`:
-   ```bash
-   cat ./maybehere07/.file2
-   ```
-   (Path file bisa berbeda, sesuaikan dengan hasil find)
+#### 2.1 Using find Command
+```bash
+# Basic search
+find . -type f -size 1033c ! -executable
 
-5. Salin password yang ditampilkan dan logout:
-   ```bash
-   exit
-   ```
+# With readability check
+find . -type f -size 1033c ! -executable -exec file {} \; | grep "ASCII text"
 
-## Penjelasan Teknis
+# With permission check
+find . -type f -size 1033c ! -perm /111
+```
 
-### Perintah Find
-Breakdown perintah find yang digunakan:
-- `.` : mencari dari direktori saat ini
-- `-type f` : hanya mencari file (bukan direktori)
-- `-size 1033c` : ukuran tepat 1033 bytes (c = bytes)
-- `! -executable` : tidak executable
-- `-exec file {} \;` : jalankan perintah file untuk setiap file yang ditemukan
-- `| grep "ASCII text"` : filter hanya file yang berisi text
+## File Properties in Linux
 
-### Opsi Size dalam Find
-- `c` : bytes
-- `k` : kilobytes
-- `M` : megabytes
-- `G` : gigabytes
+### 1. Size Specifications
+```bash
+-size n[cwbkMG]
+c: bytes
+w: two-byte words
+b: 512-byte blocks
+k: kilobytes
+M: megabytes
+G: gigabytes
+```
 
-### File Permission di Linux
-- Executable permission ditandai dengan 'x'
-- Dapat dilihat dengan `ls -l`
-- Format: `rwxrwxrwx` (user, group, others)
+### 2. Permission Attributes
+```bash
+# Executable bits
+1: execute
+2: write
+4: read
 
-## Tips
-- Gunakan `find` untuk pencarian file dengan kriteria kompleks
-- Kombinasikan beberapa perintah dengan pipe (`|`)
-- Perhatikan satuan ukuran dalam perintah find
-- Gunakan `-exec` untuk menjalankan perintah pada hasil find
+# Special permissions
+SUID (4000)
+SGID (2000)
+Sticky (1000)
+```
 
-## Konsep yang Dipelajari
-- Penggunaan advanced find command
-- File permissions di Linux
-- Kombinasi perintah dengan pipe
-- File size units
-- Executable vs non-executable files
+### 3. File Types
+```bash
+-type f  # Regular file
+-type d  # Directory
+-type l  # Symbolic link
+-type b  # Block device
+-type c  # Character device
+-type p  # Named pipe
+-type s  # Socket
+```
+
+## Advanced Find Commands
+
+### 1. Time-based Search
+```bash
+# Modified time
+find . -mtime -7          # Last 7 days
+find . -mtime +7          # More than 7 days
+find . -mmin -60         # Last hour
+
+# Access time
+find . -atime -7         # Last 7 days
+find . -amin -60         # Last hour
+
+# Change time
+find . -ctime -7         # Last 7 days
+find . -cmin -60         # Last hour
+```
+
+### 2. Permission-based Search
+```bash
+# Exact permissions
+find . -perm 644         # Exactly 644
+find . -perm -644        # At least 644
+find . -perm /644        # Any of 644
+
+# Special permissions
+find . -perm -4000       # SUID files
+find . -perm -2000       # SGID files
+find . -perm -1000       # Sticky bit
+```
+
+### 3. Size-based Search
+```bash
+# Exact size
+find . -size 1033c       # Exactly 1033 bytes
+
+# Range search
+find . -size +1000c -size -2000c  # Between 1000-2000 bytes
+find . -size +1M                   # Larger than 1MB
+find . -size -1M                   # Smaller than 1MB
+```
+
+## File Operations
+
+### 1. Testing Files
+```bash
+# Test readability
+[ -r filename ]          # Is readable
+[ -w filename ]          # Is writable
+[ -x filename ]          # Is executable
+[ -s filename ]          # Is non-empty
+```
+
+### 2. File Information
+```bash
+# Detailed info
+stat filename            # All file info
+ls -l filename          # Basic file info
+file filename           # File type info
+```
+
+### 3. Size Operations
+```bash
+# Get file size
+wc -c < filename        # Count bytes
+du -b filename          # Disk usage in bytes
+stat --format=%s filename # Size in bytes
+```
+
+## System Administration
+
+### 1. Disk Usage Analysis
+```bash
+# Find large files
+find / -type f -size +100M
+
+# Sort by size
+find / -type f -exec du -h {} + | sort -rh
+
+# Count files by size
+find / -type f -size +1M | wc -l
+```
+
+### 2. Permission Management
+```bash
+# Fix permissions
+find . -type f -exec chmod 644 {} +
+find . -type d -exec chmod 755 {} +
+
+# Remove executables
+find . -type f -perm /111 -exec chmod -x {} +
+```
+
+### 3. Space Management
+```bash
+# Clean old files
+find /tmp -type f -mtime +7 -delete
+
+# Archive large files
+find / -size +100M -exec tar czf {}.tar.gz {} \;
+```
+
+## Security Considerations
+
+### 1. SUID/SGID Files
+```bash
+# Find SUID files
+find / -perm -4000 -ls
+
+# Find SGID files
+find / -perm -2000 -ls
+
+# Remove special bits
+find / -type f -perm /6000 -exec chmod -s {} +
+```
+
+### 2. World-Writable Files
+```bash
+# Find dangerous files
+find / -type f -perm -0002 -ls
+
+# Fix permissions
+find / -type f -perm -0002 -exec chmod o-w {} +
+```
+
+### 3. Hidden Files
+```bash
+# Find hidden files
+find / -type f -name ".*" -ls
+
+# Check permissions
+find / -name ".*" -perm /0777 -ls
+```
+
+## Advanced Techniques
+
+### 1. Complex Searches
+```bash
+# Multiple conditions
+find . \( -size 1033c -o -size 2033c \) -and ! -executable
+
+# With regex
+find . -regex ".*[0-9]+" -size 1033c
+
+# With time window
+find . -size 1033c -newermt "2023-01-01" ! -newermt "2024-01-01"
+```
+
+### 2. Custom Actions
+```bash
+# Custom processing
+find . -size 1033c -exec sh -c '
+    file "{}" | grep -q "ASCII text" && echo "{}"
+' \;
+
+# With multiple commands
+find . -size 1033c -exec sh -c '
+    if file "{}" | grep -q "ASCII text"; then
+        echo "Found: {}"
+        cat "{}"
+    fi
+' \;
+```
+
+### 3. Performance Optimization
+```bash
+# Faster searches
+find . -size 1033c -print0 | xargs -0 file
+
+# Parallel processing
+find . -size 1033c -print0 | parallel -0 file
+```
+
+## Troubleshooting
+
+### 1. Common Issues
+- Permission denied
+- No such file
+- Invalid argument
+- Too many open files
+
+### 2. Solutions
+```bash
+# Handle errors
+find . -size 1033c 2>/dev/null
+
+# Limit depth
+find . -maxdepth 3 -size 1033c
+
+# Handle special files
+find . -xdev -size 1033c
+```
+
+### 3. Debugging
+```bash
+# Verbose output
+find -D exec . -size 1033c
+
+# Trace execution
+strace find . -size 1033c
+```
+
+## Best Practices
+
+### 1. Performance
+- Use appropriate options
+- Filter early
+- Handle errors
+- Use efficient commands
+
+### 2. Security
+- Check permissions
+- Validate input
+- Handle special cases
+- Document actions
+
+### 3. Maintenance
+- Regular cleanup
+- Log operations
+- Monitor usage
+- Update documentation
+
+## Additional Resources
+
+### 1. Man Pages
+```bash
+man find
+man test
+man stat
+man file
+```
+
+### 2. Tools
+- find
+- locate
+- stat
+- file
+- du
+- ls
+
+### 3. Documentation
+- GNU Findutils manual
+- Linux File System Hierarchy
+- POSIX specifications
+- Security guidelines

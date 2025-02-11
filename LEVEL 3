@@ -1,72 +1,279 @@
 # Bandit Level 2 → Level 3
 
 ## Level Goal
-Menemukan password untuk level selanjutnya yang tersimpan dalam file dengan nama yang mengandung spasi (spaces in filename) di home directory.
+Menemukan password untuk level selanjutnya yang tersimpan dalam file bernama `spaces in this filename`.
 
-## Langkah Penyelesaian
+## Detailed Command Breakdown
 
-1. Login ke server menggunakan SSH:
+### 1. SSH Connection
+```bash
+ssh bandit2@bandit.labs.overthewire.org -p 2220
+```
+
+Connection Parameters:
+- `bandit2`: username
+- `-p 2220`: port number
+- Domain: bandit.labs.overthewire.org
+
+### 2. File Handling dengan Spasi
+
+#### 2.1 Metode Quoting
+1. Single Quotes:
    ```bash
-   ssh bandit2@bandit.labs.overthewire.org -p 2220
+   cat 'spaces in this filename'
    ```
-   (Gunakan password yang didapat dari level sebelumnya)
+   - Preserves literal meaning
+   - No variable expansion
+   - Can't contain single quotes
 
-2. List isi direktori untuk menemukan file:
-   ```bash
-   ls
-   ```
-   Anda akan melihat file dengan nama yang mengandung spasi
-
-3. Ada beberapa cara untuk membaca file yang namanya mengandung spasi:
-
-   Cara 1 - Menggunakan tanda kutip:
+2. Double Quotes:
    ```bash
    cat "spaces in this filename"
    ```
+   - Allows variable expansion
+   - Special characters interpreted
+   - Can contain single quotes
 
-   Cara 2 - Menggunakan backslash untuk escape spasi:
+3. Escape Characters:
    ```bash
    cat spaces\ in\ this\ filename
    ```
+   - Backslash escapes spaces
+   - Each space needs escape
+   - More typing required
 
-4. Password akan ditampilkan setelah menjalankan salah satu perintah di atas
+#### 2.2 Tab Completion
+```bash
+cat sp<TAB>
+```
+- Shell completes filename
+- Automatically escapes spaces
+- Prevents typing errors
 
-5. Salin password dan logout:
-   ```bash
-   exit
-   ```
+## File System Concepts
 
-## Penjelasan Teknis
+### 1. Filename Conventions
+- Allowed characters: A-Z, a-z, 0-9, ., _, -
+- Special characters need escaping
+- Case sensitive
+- Maximum length: 255 bytes
+- Avoid spaces in names
 
-### Mengapa Spasi dalam Nama File Bisa Bermasalah?
-- Shell Linux menggunakan spasi sebagai pemisah argumen
-- Tanpa penanganan khusus, shell akan menginterpretasikan setiap kata sebagai argumen terpisah
-- Contoh: `cat spaces in this filename` akan diinterpretasikan sebagai perintah untuk membaca 4 file berbeda:
-  1. "spaces"
-  2. "in"
-  3. "this"
-  4. "filename"
+### 2. Special Characters
+```
+Space     # Word separator
+Tab       # Word separator
+Newline   # Command terminator
+;         # Command separator
+&         # Background process
+|         # Pipe
+>         # Redirect output
+<         # Redirect input
+*         # Wildcard
+?         # Single character wildcard
+```
 
-### Cara Menangani Spasi dalam Nama File
-1. Tanda Kutip (Quotes):
-   - Menggunakan `"..."` atau `'...'`
-   - Semua karakter di dalam tanda kutip dianggap satu kesatuan
+### 3. Path Handling
+```bash
+# Absolute path
+cat "/home/bandit2/spaces in this filename"
 
-2. Escape Character:
-   - Menggunakan backslash (`\`) sebelum spasi
-   - Backslash memberitahu shell bahwa karakter berikutnya harus diinterpretasikan secara literal
+# Relative path
+cat "./spaces in this filename"
 
-3. Tab Completion:
-   - Menekan tombol Tab akan melengkapi nama file secara otomatis
-   - Shell akan menambahkan escape character yang diperlukan
+# Using find
+find . -name "spaces in this filename" -exec cat {} \;
+```
 
-## Tips
-- Selalu gunakan tab completion untuk menghindari kesalahan pengetikan
-- Periksa nama file dengan cermat menggunakan `ls -l` untuk melihat detail lengkap
-- Simpan password yang ditemukan di tempat yang aman
+## Shell Features
 
-## Konsep yang Dipelajari
-- Penanganan karakter khusus dalam shell Linux
-- Penggunaan escape characters
-- Pentingnya quotes dalam shell
-- Tab completion sebagai alat bantu navigasi
+### 1. Word Splitting
+```bash
+# Default IFS (Internal Field Separator)
+IFS=$' \t\n'
+
+# Custom IFS for special handling
+IFS=$'\n'  # Split on newlines only
+```
+
+### 2. Filename Expansion
+```bash
+# Glob patterns
+cat sp*filename
+cat "sp"*"filename"
+cat spaces?in?this?filename
+```
+
+### 3. Command Line Parsing
+1. Tokenization
+2. Alias Expansion
+3. Parameter Expansion
+4. Command Substitution
+5. Arithmetic Expansion
+6. Word Splitting
+7. Pathname Expansion
+
+## Real-world Applications
+
+### 1. Batch Processing
+```bash
+# Process files with spaces
+for file in *; do
+    if [ -f "$file" ]; then
+        echo "Processing: $file"
+    fi
+done
+```
+
+### 2. System Administration
+```bash
+# Backup files with spaces
+find . -type f -name "* *" -exec cp {} backup/ \;
+
+# Rename files to remove spaces
+for f in *\ *; do mv "$f" "${f// /_}"; done
+```
+
+### 3. Script Writing
+```bash
+#!/bin/bash
+# Safe file handling
+filename="spaces in this filename"
+if [ -f "$filename" ]; then
+    cat "$filename"
+fi
+```
+
+## Troubleshooting
+
+### 1. Common Issues
+```bash
+# Wrong: Unquoted spaces
+cat spaces in this filename
+# Error: Too many arguments
+
+# Wrong: Partial quoting
+cat "spaces in" this filename
+# Error: File not found
+
+# Correct
+cat "spaces in this filename"
+```
+
+### 2. Debugging Tips
+```bash
+# Enable debug mode
+set -x
+cat "spaces in this filename"
+set +x
+
+# Check command interpretation
+bash -x script.sh
+```
+
+### 3. Error Messages
+- "No such file or directory"
+- "Too many arguments"
+- "Ambiguous redirect"
+
+## Security Considerations
+
+### 1. Input Validation
+```bash
+# Validate filename
+if [[ "$filename" =~ ^[A-Za-z0-9._-]+$ ]]; then
+    echo "Safe filename"
+fi
+```
+
+### 2. Path Traversal Prevention
+```bash
+# Sanitize file path
+realpath "$filename"
+basename "$filename"
+```
+
+### 3. Permission Checks
+```bash
+if [ -r "$filename" ]; then
+    cat "$filename"
+else
+    echo "Permission denied"
+fi
+```
+
+## Advanced Tips
+
+### 1. Filename Manipulation
+```bash
+# Remove spaces
+rename 's/ /_/g' *
+
+# Convert to lowercase
+rename 'y/A-Z/a-z/' *
+
+# Add prefix/suffix
+rename 's/^/prefix_/' *
+```
+
+### 2. Mass Operations
+```bash
+# Find and process
+find . -type f -name "* *" -print0 | xargs -0 process_file
+
+# Parallel processing
+parallel process_file ::: ./*
+```
+
+### 3. Shell Functions
+```bash
+process_spaces() {
+    local file="$1"
+    if [ -f "$file" ]; then
+        cat "$file"
+    fi
+}
+```
+
+## Best Practices
+
+### 1. Filename Conventions
+- Use underscores instead of spaces
+- Keep names short but descriptive
+- Use consistent naming patterns
+- Avoid special characters
+
+### 2. Script Safety
+```bash
+# Enable safety options
+set -euo pipefail
+IFS=$'\n\t'
+```
+
+### 3. Error Handling
+```bash
+if ! cat "$filename" 2>/dev/null; then
+    echo "Error reading file" >&2
+    exit 1
+fi
+```
+
+## Additional Resources
+
+### 1. Manual Pages
+```bash
+man bash  # Shell behavior
+man find  # File searching
+man rename # Bulk renaming
+```
+
+### 2. Online Documentation
+- Bash Guide for Beginners
+- Advanced Bash Scripting Guide
+- Linux Documentation Project
+
+### 3. Practice Exercises
+1. Create files with spaces
+2. Write scripts to handle them
+3. Test different quoting methods
+4. Debug common issues

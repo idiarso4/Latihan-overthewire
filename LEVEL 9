@@ -1,83 +1,254 @@
 # Bandit Level 8 → Level 9
 
 ## Level Goal
-Menemukan password untuk level selanjutnya yang tersimpan dalam file `data.txt`. Password adalah satu-satunya baris teks yang hanya muncul satu kali dalam file.
+Menemukan password untuk level selanjutnya yang tersimpan dalam file `data.txt`, dimana password adalah satu-satunya baris yang muncul hanya sekali (unik).
 
-## Langkah Penyelesaian
+## Detailed Command Breakdown
 
-1. Login ke server menggunakan SSH:
-   ```bash
-   ssh bandit8@bandit.labs.overthewire.org -p 2220
-   ```
-   (Gunakan password yang didapat dari level sebelumnya)
+### 1. SSH Connection
+```bash
+ssh bandit8@bandit.labs.overthewire.org -p 2220
+```
 
-2. Verifikasi keberadaan file data.txt:
-   ```bash
-   ls -l data.txt
-   ```
+### 2. Mencari Baris Unik
+```bash
+# Metode dasar
+sort data.txt | uniq -u
 
-3. Gunakan kombinasi `sort` dan `uniq` untuk menemukan baris unik:
-   ```bash
-   sort data.txt | uniq -u
-   ```
-   
-   Penjelasan command:
-   - `sort`: mengurutkan baris-baris teks
-   - `uniq -u`: menampilkan hanya baris yang muncul sekali
+# Dengan tampilan jumlah kemunculan
+sort data.txt | uniq -c | grep "^      1 "
 
-4. Password akan ditampilkan sebagai satu-satunya output
+# Dengan output yang lebih rapi
+sort data.txt | uniq -c | awk '$1 == 1 {print $2}'
+```
 
-5. Salin password dan logout:
-   ```bash
-   exit
-   ```
+## Perintah Sort
 
-## Penjelasan Teknis
+### 1. Penggunaan Dasar
+```bash
+# Sort biasa
+sort file.txt
 
-### Perintah Sort
-- Mengurutkan baris teks secara alfabetis
-- Diperlukan sebelum menggunakan uniq
-- Default: ascending order
-- Case sensitive
+# Sort numerik
+sort -n file.txt
 
-### Perintah Uniq
-- Membandingkan baris yang berdekatan
-- Harus digunakan setelah sort
-- Opsi yang berguna:
-  - `-u`: tampilkan hanya baris unik
-  - `-d`: tampilkan hanya baris duplikat
-  - `-c`: tampilkan hitungan kemunculan
+# Sort terbalik (descending)
+sort -r file.txt
 
-### Mengapa Sort Dulu?
-- Uniq hanya membandingkan baris yang berdekatan
-- Sort mengelompokkan baris yang sama
-- Kombinasi keduanya efektif untuk menemukan uniqueness
+# Sort berdasarkan kolom
+sort -k2 file.txt
+```
 
-## Tips
-- Selalu sort sebelum uniq
-- Gunakan opsi uniq sesuai kebutuhan
-- Perhatikan case sensitivity
-- Pipe berguna untuk menggabungkan commands
+### 2. Opsi Tambahan
+```bash
+# Abaikan case
+sort -f file.txt
 
-## Konsep yang Dipelajari
-- Text processing di Linux
-- Penggunaan sort dan uniq
-- Piping multiple commands
-- Pattern finding dalam data
-- Pentingnya urutan command
+# Hapus duplikat
+sort -u file.txt
 
-## Variasi Command yang Bisa Digunakan
-1. Dengan hitungan kemunculan:
-   ```bash
-   sort data.txt | uniq -c | grep "1 "
-   ```
+# Sort bulan
+sort -M file.txt
 
-2. Dengan sort numerik (jika ada):
-   ```bash
-   sort -n data.txt | uniq -u
-   ```
+# Sort berdasarkan versi
+sort -V file.txt
+```
 
-3. Case insensitive (jika perlu):
-   ```bash
-   sort -f data.txt | uniq -i -u
-   ```
+### 3. Modifikasi Output
+```bash
+# Cek apakah sudah terurut
+sort -c file.txt
+
+# Simpan hasil ke file baru
+sort file.txt -o sorted.txt
+
+# Batasi memori yang digunakan
+sort -S 100M file.txt
+```
+
+## Perintah Uniq
+
+### 1. Penggunaan Dasar
+```bash
+# Hapus baris berurutan yang duplikat
+uniq file.txt
+
+# Tampilkan hanya baris unik
+uniq -u file.txt
+
+# Tampilkan hanya baris duplikat
+uniq -d file.txt
+```
+
+### 2. Opsi Tambahan
+```bash
+# Hitung kemunculan
+uniq -c file.txt
+
+# Abaikan n karakter pertama
+uniq -s N file.txt
+
+# Bandingkan hanya n karakter
+uniq -w N file.txt
+```
+
+### 3. Kombinasi dengan Sort
+```bash
+# Urutkan dulu, baru cari unik
+sort file.txt | uniq
+
+# Hitung frekuensi kemunculan
+sort file.txt | uniq -c
+
+# Cari yang paling sering muncul
+sort file.txt | uniq -c | sort -nr
+```
+
+## Teknik Pemrosesan Teks
+
+### 1. Filter dan Transformasi
+```bash
+# Filter berdasarkan panjang baris
+awk 'length($0) > 10' file.txt
+
+# Ubah ke uppercase
+tr '[:lower:]' '[:upper:]' < file.txt
+
+# Hapus karakter tertentu
+tr -d '[:digit:]' < file.txt
+```
+
+### 2. Manipulasi Kolom
+```bash
+# Ambil kolom pertama
+cut -f1 file.txt
+
+# Pisahkan berdasarkan delimiter
+cut -d: -f1,3 file.txt
+
+# Gabungkan file berdasarkan kolom
+join file1.txt file2.txt
+```
+
+### 3. Statistik Teks
+```bash
+# Hitung kata
+wc -w file.txt
+
+# Hitung baris
+wc -l file.txt
+
+# Hitung karakter
+wc -m file.txt
+```
+
+## Tips Penggunaan
+
+### 1. Efisiensi
+- Sort dulu sebelum uniq
+- Gunakan opsi yang tepat
+- Pertimbangkan ukuran file
+- Manfaatkan pipeline
+
+### 2. Pemecahan Masalah
+- Cek format input
+- Perhatikan karakter tersembunyi
+- Verifikasi hasil sorting
+- Gunakan tools debugging
+
+### 3. Best Practices
+- Backup file original
+- Dokumentasikan command
+- Validasi hasil
+- Gunakan file sementara
+
+## Contoh Kasus
+
+### 1. Analisis Log
+```bash
+# Hitung IP unik
+sort access.log | cut -d' ' -f1 | uniq -c
+
+# Cari error paling sering
+grep ERROR log.txt | sort | uniq -c | sort -nr
+
+# Monitor akses unik per jam
+awk '{print $4}' access.log | cut -d: -f1 | sort | uniq -c
+```
+
+### 2. Pemrosesan Data
+```bash
+# Hapus header duplikat
+tail -n +2 data.csv | sort -u
+
+# Gabung data dari multiple file
+cat *.txt | sort | uniq > combined.txt
+
+# Filter data berdasarkan frekuensi
+sort data.txt | uniq -c | awk '$1 >= 5'
+```
+
+### 3. Pembersihan Teks
+```bash
+# Hapus baris kosong
+grep -v '^$' file.txt
+
+# Hapus whitespace
+sed 's/^[ \t]*//' file.txt
+
+# Standarisasi format
+tr -s '[:space:]' ' ' < file.txt
+```
+
+## Troubleshooting
+
+### 1. Masalah Umum
+- File terlalu besar
+- Karakter tersembunyi
+- Encoding tidak sesuai
+- Memory tidak cukup
+
+### 2. Solusi
+```bash
+# Cek karakter tersembunyi
+cat -A file.txt
+
+# Cek encoding
+file -i file.txt
+
+# Split file besar
+split -l 1000 file.txt part_
+```
+
+### 3. Debugging
+```bash
+# Tampilkan proses
+set -x
+command
+set +x
+
+# Cek status error
+echo $?
+```
+
+## Referensi
+
+### 1. Manual Pages
+```bash
+man sort
+man uniq
+man tr
+man cut
+```
+
+### 2. Dokumentasi
+- GNU Text Processing
+- Shell Scripting Guide
+- Regular Expressions
+- Text Processing Tools
+
+### 3. Tools Tambahan
+- awk
+- sed
+- grep
+- perl

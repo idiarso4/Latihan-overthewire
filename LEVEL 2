@@ -3,90 +3,265 @@
 ## Level Goal
 Menemukan password untuk level selanjutnya yang tersimpan dalam file bernama `-` di home directory.
 
-## Langkah Penyelesaian
+## Detailed Command Breakdown
 
-1. Login ke server menggunakan SSH:
-   ```bash
-   ssh bandit1@bandit.labs.overthewire.org -p 2220
-   ```
-   (Gunakan password yang didapat dari level sebelumnya)
+### 1. SSH Connection
+```bash
+ssh bandit1@bandit.labs.overthewire.org -p 2220
+```
+Opsi yang tersedia:
+- `-p`: Specify port number
+- `-v`: Verbose mode untuk debugging
+- `-i`: Gunakan private key file
+- `-X`: Enable X11 forwarding
+- `-C`: Enable compression
 
-2. List isi direktori:
-   ```bash
-   ls -la
-   ```
-   Anda akan melihat file bernama `-`
+### 2. Directory Navigation
+```bash
+pwd                 # Print working directory
+ls -la             # List all files with details
+cd /home/bandit1   # Change to specific directory
+```
 
-3. Ada beberapa cara untuk membaca file yang namanya `-`:
-
-   Cara 1 - Menggunakan path relatif:
+### 3. File Reading Methods
+1. Menggunakan Path Relatif:
    ```bash
    cat ./-
    ```
 
-   Cara 2 - Menggunakan path absolut:
+2. Menggunakan Path Absolut:
    ```bash
    cat /home/bandit1/-
    ```
 
-   Cara 3 - Menggunakan redirect:
+3. Menggunakan Input Redirection:
    ```bash
    cat < -
    ```
 
-4. Password akan ditampilkan setelah menjalankan salah satu perintah di atas
-
-5. Salin password dan logout:
+4. Menggunakan String Concatenation:
    ```bash
-   exit
+   cat $(echo "-")
    ```
 
-## Penjelasan Teknis
+## Linux File System Hierarchy
 
-### Mengapa File Bernama `-` Bermasalah?
-- Tanda `-` diinterpretasikan sebagai opsi command
-- Shell mencoba membacanya sebagai parameter
-- Perlu cara khusus untuk memberitahu shell bahwa `-` adalah nama file
+### 1. Standard Directories
+- `/bin`: Essential command binaries
+- `/boot`: Boot loader files
+- `/dev`: Device files
+- `/etc`: System configuration
+- `/home`: User home directories
+- `/lib`: Essential shared libraries
+- `/media`: Removable media
+- `/mnt`: Temporary mount points
+- `/opt`: Optional packages
+- `/proc`: Process information
+- `/root`: Root user's home
+- `/sbin`: System binaries
+- `/tmp`: Temporary files
+- `/usr`: User programs
+- `/var`: Variable data
 
-### Cara Menangani File `-`
-1. Menggunakan `./`
-   - Menunjukkan path relatif
-   - Shell tahu ini adalah file path
+### 2. Path Types
+1. Absolute Path:
+   - Dimulai dari root (/)
+   - Contoh: /home/bandit1/-
 
-2. Menggunakan path absolut
-   - Menunjukkan lokasi lengkap
-   - Tidak ambigu
+2. Relative Path:
+   - Relatif terhadap current directory
+   - Contoh: ./-
 
-3. Menggunakan redirect
-   - `<` membaca dari file
-   - Menghindari interpretasi `-` sebagai opsi
+### 3. Special Characters
+- `.`: Current directory
+- `..`: Parent directory
+- `~`: Home directory
+- `-`: Previous directory atau special character
+- `/`: Directory separator
 
-### Praktik Terbaik
-- Hindari membuat file dengan nama `-`
-- Selalu gunakan nama file yang jelas
-- Pahami cara menangani special characters
+## File Permissions Deep Dive
 
-## Tips
-- Gunakan tab completion untuk menghindari masalah
-- Perhatikan pesan error yang muncul
-- Coba berbagai metode jika satu cara tidak berhasil
-- Selalu verifikasi isi file setelah membacanya
+### 1. Permission Bits
+```
+-rw-r--r--  1  bandit1  bandit1  33  Feb 12 10:00  -
+↑ ↑↑↑ ↑↑↑ ↑↑↑  ↑   ↑       ↑     ↑      ↑       ↑
+│ │││ │││ │││  │   │       │     │      │       └─ Nama File
+│ │││ │││ │││  │   │       │     │      └─ Waktu Modifikasi
+│ │││ │││ │││  │   │       │     └─ Ukuran (bytes)
+│ │││ │││ │││  │   │       └─ Grup
+│ │││ │││ │││  │   └─ Pemilik
+│ │││ │││ └││─ Other Permissions
+│ │││ └││─ Group Permissions
+│ └││─ User Permissions
+└─ File Type
+```
 
-## Konsep yang Dipelajari
-- Special characters di shell
-- Path relatif vs absolut
-- Input/output redirection
-- Shell parameter parsing
-- Command line troubleshooting
+### 2. Numeric Permissions
+- 4 (read)
+- 2 (write)
+- 1 (execute)
+- Contoh: 644 = rw-r--r--
 
-## Penggunaan di Dunia Nyata
-- Menangani file dengan nama special
-- Memahami shell behavior
-- Debugging command line issues
-- File naming conventions
+### 3. Special Permissions
+- SUID (4000)
+- SGID (2000)
+- Sticky Bit (1000)
 
-## Catatan Keamanan
-- Perhatikan file permissions
-- Verifikasi isi file sebelum eksekusi
-- Hindari nama file yang membingungkan
-- Selalu backup data penting
+## Advanced Shell Features
+
+### 1. Command Line Operators
+```bash
+;    # Command separator
+&&   # Logical AND
+||   # Logical OR
+|    # Pipe
+>    # Output redirection
+<    # Input redirection
+>>   # Append output
+2>   # Redirect stderr
+2>&1 # Redirect stderr to stdout
+```
+
+### 2. Shell Expansions
+```bash
+*        # Wildcard
+?        # Single character wildcard
+[abc]    # Character class
+{a,b,c}  # Brace expansion
+$(cmd)   # Command substitution
+$((1+1)) # Arithmetic expansion
+```
+
+### 3. Shell Variables
+```bash
+$PATH    # System path
+$HOME    # Home directory
+$USER    # Current user
+$PWD     # Current directory
+$?       # Last exit code
+$$       # Current process ID
+```
+
+## Real-world Applications
+
+### 1. System Administration
+- Log file management
+- Configuration file editing
+- Batch processing
+- System monitoring
+
+### 2. Security Operations
+- File integrity checking
+- Permission auditing
+- Security log analysis
+- Access control management
+
+### 3. Development Tasks
+- Source code management
+- Build script creation
+- Debug log analysis
+- Configuration management
+
+## Troubleshooting Scenarios
+
+### 1. Permission Issues
+```bash
+# Check file permissions
+ls -l -
+stat -
+getcap -
+
+# Modify permissions if needed
+chmod 644 -
+chown user:group -
+```
+
+### 2. Path Issues
+```bash
+# Verify current location
+pwd
+readlink -f -
+
+# Search for file
+find / -name "-" 2>/dev/null
+locate -
+```
+
+### 3. Command Issues
+```bash
+# Debug commands
+set -x
+bash -x script.sh
+strace command
+```
+
+## Security Best Practices
+
+### 1. File Handling
+- Verify file contents before reading
+- Use secure deletion methods
+- Maintain proper permissions
+- Regular integrity checking
+
+### 2. Command Execution
+- Avoid command injection
+- Validate input data
+- Use absolute paths
+- Quote variables properly
+
+### 3. Session Security
+- Use SSH keys when possible
+- Enable 2FA where available
+- Regular password rotation
+- Session timeout settings
+
+## Advanced Tips and Tricks
+
+### 1. Efficiency Shortcuts
+```bash
+!!      # Repeat last command
+!$      # Last argument of previous command
+ctrl-r  # Search command history
+alt-.   # Insert last argument
+```
+
+### 2. File Operations
+```bash
+cp -p   # Preserve permissions
+mv -i   # Interactive move
+rm -i   # Interactive remove
+ls -R   # Recursive listing
+```
+
+### 3. Text Processing
+```bash
+grep -r  # Recursive search
+sed -i   # In-place editing
+awk -F   # Field separator
+sort -n  # Numeric sort
+```
+
+## Reference Commands
+```bash
+man bash
+info coreutils
+help cd
+whatis command
+apropos keyword
+```
+
+## Additional Resources
+1. Documentation:
+   - Linux Documentation Project
+   - GNU Coreutils Manual
+   - Bash Reference Manual
+
+2. Online Resources:
+   - Linux Command Library
+   - Shell Scripting Tutorial
+   - Linux Security Guide
+
+3. Practice Environments:
+   - Linux Labs
+   - Virtual Machines
+   - Docker Containers
